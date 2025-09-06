@@ -176,13 +176,14 @@ ML_TransportAPP1/
 
 ## 📄 Licence
 
-Ce projet est sous licence propriétaire. Tous droits réservés © ML Transport.
+1. Ce projet est sous licence propriétaire. Tous droits réservés © ML_Forever.Inc
 
 ## 📞 Contact
 
 Pour toute question ou support, veuillez contacter :
-- Email : support@mltransport.com
-- Téléphone : +33 1 23 45 67 89
+- Email : mltransport1174@gmail.com
+- arleys4u@gmail.com
+- Téléphone : +241 077971697
 
 1. Construire l'application :
    ```bash
@@ -192,4 +193,4 @@ Pour toute question ou support, veuillez contacter :
 
 ## Licence
 
-Propriétaire - ML Transport
+Propriétaire - ML_Forever.Inc and CO
