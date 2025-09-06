@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion | ML TRANSPORT</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Barre de navigation -->
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet">
+  <link href="/css/pages/auth.css" rel="stylesheet">
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  <style>
+    body {
+  padding-top: 70px;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://source.unsplash.com/random/1600x900/?bus,transport') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .brand-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      display: block;
+    }
+    .btn-login {
+      background: #0d6efd;
+      border: none;
+      padding: 10px;
+      font-weight: 600;
+    }
+    .alert-info a {
+      color: #084298;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <span class="logo-mlapp">ML</span>
+      <span>Transport</span>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="bus.html">
+            <i class="ph ph-bus"></i> Bus
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="finance.html">
+            <i class="ph ph-currency-dollar"></i> Finance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chauffeurs.html">
+            <i class="ph ph-users"></i> Chauffeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="statistiques.html">
+            <i class="ph ph-chart-bar"></i> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="maintenance.html">
+            <i class="ph ph-wrench"></i> Maintenance
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="ph ph-user-circle fs-4 me-2"></i>
+            <span id="username">Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+        <li class="nav-item ms-2">
+          <button class="btn btn-link nav-link" id="themeToggle">
+            <i class="ph ph-moon" id="themeIcon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+  <div class="login-box text-center">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMDk2OWQ5IiBkPSJNNDQ4IDBIMTZDNy4yIDAgMCA3LjIgMCAxNnY0ODBjMCA4LjggNy4yIDE2IDE2IDE2aDQzMmM4LjggMCAxNi03LjIgMTYtMTZWMTZjMC04LjgtNy4yLTE2LTE2LTE2em0tOTYgMzUyYzAgOC44LTcuMiAxNi0xNiAxNmgtMzJjLTguOCAwLTE2LTcuMi0xNi0xNnYtOTZjMC04LjggNy4yLTE2IDE2LTE2aDMyYzguOCAwIDE2IDcuMiAxNiAxNnY5NnptMCAtMjI0YzAgOC44LTcuMiAxNi0xNiAxNmgtMzJjLTguOCAwLTE2LTcuMi0xNi0xNnYtMzJjMC04LjggNy4yLTE2IDE2LTE2aDMyYzguOCAwIDE2IDcuMiAxNiAxNnYzMnptLTk2IDEyOGMwIDguOC03LjIgMTYtMTYgMTZoLTMyYy04LjggMC0xNi03LjItMTYtMTZ2LTMyYzAtOC44IDcuMi0xNiAxNi0xNmgzMmM4LjggMCAxNiA3LjIgMTYgMTZ2MzJ6bTAgLTE2MGMwIDguOC03LjIgMTYtMTYgMTZoLTMyYy04LjggMC0xNi03LjItMTYtMTZWNjRjMC04LjggNy4yLTE2IDE2LTE2aDMyYzguOCAwIDE2IDcuMiAxNiAxNnY5NnoiLz48L3N2Zz4=" alt="Logo ML Transport" class="brand-logo">
+    <h3 class="mb-4">ML TRANSPORT</h3>
+    
+    <form id="loginForm">
+      <div class="mb-3 text-start">
+        <label class="form-label">Nom d'utilisateur</label>
+        <input type="text" class="form-control" id="loginUsername" value="admin" required>
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label">Mot de passe</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" value="admin123" required>
+          <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+            <i class="ph ph-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-login w-100 mb-3">
+        <i class="ph ph-sign-in"></i> Se connecter
+      </button>
+    </form>
+    
+    <div id="errorMsg" class="alert alert-danger mt-3 d-none"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/modules/auth/auth.js" type="module"></script>
+  <script src="/js/modules/init-admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const errorMsg = document.getElementById('errorMsg');
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      
+      // Basculer la visibilité du mot de passe
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        this.querySelector('i').classList.toggle('ph-eye');
+        this.querySelector('i').classList.toggle('ph-eye-slash');
+      });
+      
+      // Rediriger automatiquement si déjà connecté
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        window.location.href = 'index.html';
+      }
+      
+      // Gestion de la connexion
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('password').value;
+        const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+        
+        // Créer un compte admin par défaut s'il n'existe pas
+        if (!settings.username || !settings.password) {
+          settings.username = 'admin';
+          settings.password = 'admin123';
+          settings.adminFullName = 'Administrateur';
+          localStorage.setItem('appSettings', JSON.stringify(settings));
+        }
+        
+        if (settings.username === username && settings.password === password) {
+          // Connexion réussie
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('currentUser', JSON.stringify({
+            username: settings.username,
+            fullName: settings.adminFullName || 'Administrateur',
+            role: 'admin'
+          }));
+          
+          window.location.href = 'index.html';
+        } else {
+          showError("Identifiants incorrects. Essayez admin / admin123");
+        }
+      });
+      
+      function showError(message) {
+        errorMsg.textContent = message;
+        errorMsg.classList.remove('d-none');
+        setTimeout(() => errorMsg.classList.add('d-none'), 5000);
+      }
+      
+      // Solution de secours si localStorage est bloqué
+      if (!testLocalStorage()) {
+        document.body.innerHTML = `
+          <div class="alert alert-danger">
+            <h4>Erreur de stockage</h4>
+            <p>Votre navigateur bloque l'accès au stockage local. Veuillez :</p>
+            <ol>
+              <li>Autoriser les cookies et le stockage local</li>
+              <li>Utiliser un navigateur moderne</li>
+              <li>Éviter le mode navigation privée</li>
+            </ol>
+          </div>
+        `;
+      }
+      
+      function testLocalStorage() {
+        try {
+          localStorage.setItem('test', 'test');
+          localStorage.removeItem('test');
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

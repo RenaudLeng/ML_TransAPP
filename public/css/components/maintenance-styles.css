@@ -1,0 +1,97 @@
+/* Styles spécifiques pour la page de maintenance */
+.table > :not(caption) > * > * {
+  padding: 1rem 1.25rem;
+  border-bottom-width: 1px;
+  vertical-align: middle;
+}
+
+.table > :not(:last-child) > :last-child > * {
+  border-bottom-color: #e9ecef;
+}
+
+/* Styles pour les badges */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+  border-radius: 50rem;
+  font-size: 0.8em;
+}
+
+/* Styles pour la pagination */
+.pagination {
+  margin: 1.5rem 0 0;
+  justify-content: flex-end;
+}
+
+/* Styles pour les boutons d'action */
+.btn-action {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+/* Styles pour les cartes de statistiques */
+.card-stat {
+  border-left: 4px solid #0d6efd;
+  transition: transform 0.2s;
+}
+
+.card-stat:hover {
+  transform: translateY(-5px);
+}
+
+/* Styles pour les onglets */
+.nav-tabs .nav-link {
+  color: #6c757d;
+  font-weight: 500;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  background-color: transparent;
+  border-bottom: 2px solid #0d6efd;
+}
+
+/* Styles pour les formulaires */
+.form-select, .form-control {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+}
+
+/* Styles pour les tableaux */
+.table {
+  margin-bottom: 0;
+  --bs-table-hover-bg: rgba(13, 110, 253, 0.05);
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom-width: 1px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  padding: 1rem 1.25rem;
+}
+
+/* Styles pour les badges de statut */
+.badge.bg-success {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  color: var(--success-color);
+}
+
+.badge.bg-warning {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+  color: var(--warning-color);
+}
+
+.badge.bg-danger {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  color: var(--danger-color);
+}

@@ -1,0 +1,55 @@
+
+/* BASE */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 80px;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* HEADER GRADIENT */
+header {
+  color: white;
+}
+
+/* ICONES ANIMÉES */
+.animate__animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.animate__bounceInLeft {
+  animation-name: bounceInLeft;
+}
+
+@keyframes bounceInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-300px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(25px);
+  }
+  80% {
+    transform: translateX(-10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* NAVBAR ACTIVE */
+.nav-link.active {
+  font-weight: bold;
+  color: #0d6efd !important;
+}
+
+/* CITATION */
+blockquote {
+  font-size: 1.2rem;
+  color: #555;
+}
+

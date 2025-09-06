@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion | ML TRANSPORT</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/components/buttons.css">
+  <link rel="stylesheet" href="/css/pages/auth.css">
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-hover: #0b5ed7;
+      --bg-color: #f8f9fa;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    
+    .login-container {
+      max-width: 400px;
+      width: 90%;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+    }
+    
+    .login-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+    
+    .login-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+    
+    .login-body {
+      padding: 2rem 1.5rem;
+    }
+    
+    .form-control {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #dee2e6;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-login {
+      background: var(--primary-color);
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .btn-login:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    
+    .password-toggle {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+    
+    .error-message {
+      display: none;
+      margin-top: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-floating > label {
+      padding: 0.75rem;
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+      transform: scale(0.85) translateY(-0.9rem) translateX(0.15rem);
+    }
+  </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/navbar.css" rel="stylesheet"></head>
+<body>
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <div class="login-container">
+    <div class="login-header">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTQ0OCAwSDE2QzcuMiAwIDAgNy4yIDAgMTZ2NDgwYzAgOC44IDcuMiAxNiAxNiAxNmg0MzJjOC44IDAgMTYtNy4yIDE2LTE2VjE2YzAtOC44LTcuMi0xNi0xNi0xNnptLTk2IDM1MmMwIDguOC03LjIgMTYtMTYgMTZoLTMyYy04LjggMC0xNi03LjItMTYtMTZ2LTk2YzAtOC44IDcuMi0xNiAxNi0xNmgzMmM4LjggMCAxNiA3LjIgMTYgMTZ2OTZ6bTAgLTIyNGMwIDguOC03LjIgMTYtMTYgMTZoLTMyYy04LjggMC0xNi03LjItMTYtMTZ2LTM0YzAtOC44IDcuMi0xNiAxNi0xNmgzMmM4LjggMCAxNiA3LjIgMTYgMTZ2MzR6bS05NiAxMjhjMCA4LjgtNy4yIDE2LTE2IDE2aC0zMmMtOC44IDAtMTYtNy4yLTE2LTE2di0zNGMwLTguOCA3LjItMTYgMTYtMTZoMzJjOC44IDAgMTYgNy4yIDE2IDE2djM0em0wIC0xNjBjMCA4LjgtNy4yIDE2LTE2IDE2aC0zMmMtOC44IDAtMTYtNy4yLTE2LTE2VjY0YzAtOC44IDcuMi0xNiAxNi0xNmgzMmM4LjggMCAxNiA3LjIgMTYgMTZ2OTZ6Ii8+PC9zdmc+" alt="Logo ML Transport" class="login-logo">
+      <h2 class="mb-0">ML TRANSPORT</h2>
+      <p class="mb-0 opacity-75">Connexion à l'espace d'administration</p>
+    </div>
+    
+    <div class="login-body">
+      <form id="loginForm">
+        <div class="mb-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="loginUsername" placeholder="Nom d'utilisateur" value="admin" required>
+            <label for="loginUsername">
+              <i class="ph ph-user me-2"></i>Nom d'utilisateur
+            </label>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Mot de passe" value="admin123" required>
+            <label for="password">
+              <i class="ph ph-lock me-2"></i>Mot de passe
+            </label>
+            <div class="position-absolute end-0 top-0 mt-3 me-3">
+              <i class="ph ph-eye password-toggle" id="togglePassword"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-login">
+            <i class="ph ph-sign-in me-2"></i>Se connecter
+          </button>
+        </div>
+        
+        <div class="alert alert-danger mt-3 d-none" id="errorMsg" role="alert">
+          <i class="ph ph-warning-circle me-2"></i>
+          <span id="errorText"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/modules/auth/auth.js" type="module"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const errorMsg = document.getElementById('errorMsg');
+      const errorText = document.getElementById('errorText');
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      
+      // Basculer la visibilité du mot de passe
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        this.classList.toggle('ph-eye');
+        this.classList.toggle('ph-eye-slash');
+      });
+      
+      // Rediriger automatiquement si déjà connecté
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        window.location.href = 'index.html';
+      }
+      
+      // Gestion de la connexion
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('password').value;
+        const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+        
+        // Créer un compte admin par défaut s'il n'existe pas
+        if (!settings.username || !settings.password) {
+          settings.username = 'admin';
+          settings.password = 'admin123';
+          settings.adminFullName = 'Administrateur';
+          localStorage.setItem('appSettings', JSON.stringify(settings));
+        }
+        
+        if (settings.username === username && settings.password === password) {
+          // Connexion réussie
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('currentUser', JSON.stringify({
+            username: settings.username,
+            fullName: settings.adminFullName || 'Administrateur',
+            role: 'admin'
+          }));
+          
+          // Redirection vers la page d'accueil
+          window.location.href = 'index.html';
+        } else {
+          showError("Identifiants incorrects. Essayez admin / admin123");
+        }
+      });
+      
+      function showError(message) {
+        errorText.textContent = message;
+        errorMsg.classList.remove('d-none');
+        errorMsg.classList.add('show');
+        
+        // Masquer le message d'erreur après 5 secondes
+        setTimeout(() => {
+          errorMsg.classList.remove('show');
+          setTimeout(() => errorMsg.classList.add('d-none'), 300);
+        }, 5000);
+      }
+      
+      // Vérifier si localStorage est disponible
+      function testLocalStorage() {
+        try {
+          localStorage.setItem('test', 'test');
+          localStorage.removeItem('test');
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      if (!testLocalStorage()) {
+        showError("Votre navigateur ne supporte pas le stockage local. Veuillez mettre à jour votre navigateur ou activer les cookies.");
+      }
+    });
+  </script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

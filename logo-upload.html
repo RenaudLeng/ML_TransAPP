@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'icônes ML Transport</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Barre de navigation -->
+  <link href="public/css/components/navbar.css" rel="stylesheet">
+    <style>
+        body {
+  padding-top: 70px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .preview-container {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        .preview-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .preview-item img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 5px;
+        }
+        .preview-item p {
+            margin: 0;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        #dropZone {
+            border: 2px dashed #0d6efd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #dropZone.dragover {
+            background: #e7f1ff;
+            border-color: #084298;
+        }
+        .icon-sizes {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+    </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet"></head>
+<body class="light-mode">
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <span class="logo-mlapp">ML</span>
+      <span>Transport</span>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="bus.html">
+            <i class="ph ph-bus"></i> Bus
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="finance.html">
+            <i class="ph ph-currency-dollar"></i> Finance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chauffeurs.html">
+            <i class="ph ph-users"></i> Chauffeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="statistiques.html">
+            <i class="ph ph-chart-bar"></i> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="maintenance.html">
+            <i class="ph ph-wrench"></i> Maintenance
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="ph ph-user-circle fs-4 me-2"></i>
+            <span id="username">Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+        <li class="nav-item ms-2">
+          <button class="btn btn-link nav-link" id="themeToggle">
+            <i class="ph ph-moon" id="themeIcon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="container">
+        <h1 class="mb-4">Générateur d'icônes ML Transport</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Instructions</h5>
+                <p class="card-text">
+                    1. Téléchargez votre logo (format recommandé : PNG avec fond transparent)<br>
+                    2. Taille minimale recommandée : 512x512 pixels<br>
+                    3. Le système générera automatiquement toutes les tailles nécessaires
+                </p>
+            </div>
+        </div>
+        <div id="dropZone" class="mb-4">
+            <i class="ph ph-upload"></i>
+            <h3>Glissez votre logo ici</h3>
+            <p>ou</p>
+            <input type="file" id="fileInput" class="d-none" accept="image/*">
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                Sélectionner un fichier
+            </button>
+            <div class="icon-sizes">
+                Tailles générées : 512x512, 384x384, 192x192, 152x152, 144x144, 128x128, 96x96, 72x72
+            </div>
+        </div>
+
+        <div class="preview-container" id="previewContainer"></div>
+    </div>
+
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+
+        // Tailles d'icônes requises
+        const iconSizes = [
+            { size: 512, name: 'icon-512x512' },
+            { size: 384, name: 'icon-384x384' },
+            { size: 192, name: 'icon-192x192' },
+            { size: 152, name: 'icon-152x152' },
+            { size: 144, name: 'icon-144x144' },
+            { size: 128, name: 'icon-128x128' },
+            { size: 96, name: 'icon-96x96' },
+            { size: 72, name: 'icon-72x72' }
+        ];
+
+        // Gestion du drag & drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('dragover');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFileSelect, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            handleFile(file);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            handleFile(file);
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner une image.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    generateIcons(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function generateIcons(sourceImg) {
+            previewContainer.innerHTML = '';
+
+            iconSizes.forEach(icon => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = icon.size;
+                canvas.height = icon.size;
+
+                // Dessiner l'image redimensionnée
+                ctx.drawImage(sourceImg, 0, 0, icon.size, icon.size);
+
+                // Créer la prévisualisation
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+
+                const previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL('image/png');
+
+                const sizeText = document.createElement('p');
+                sizeText.textContent = `${icon.size}x${icon.size}`;
+
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = canvas.toDataURL('image/png');
+                downloadBtn.download = `${icon.name}.png`;
+                downloadBtn.className = 'btn btn-sm btn-outline-primary mt-2';
+                downloadBtn.textContent = 'Télécharger';
+
+                previewItem.appendChild(previewImg);
+                previewItem.appendChild(sizeText);
+                previewItem.appendChild(downloadBtn);
+                previewContainer.appendChild(previewItem);
+
+                // Sauvegarder automatiquement
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `${icon.name}.png`;
+                link.click();
+            });
+        }
+    </script>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="public/js/modules/include-navbar.js"></script>
+      <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html> 

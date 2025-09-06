@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="/public/assets/img/logo.png" alt="ML Transport" height="40" class="d-inline-block align-text-top me-2">
+      <span class="d-none d-md-inline">ML TRANSPORT</span>
+    </a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house me-1"></i> Tableau de bord
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="operationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ph ph-clipboard-text me-1"></i> Opérations
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="operationsDropdown">
+            <li><a class="dropdown-item" href="planning.html"><i class="ph ph-calendar-check me-2"></i>Planning</a></li>
+            <li><a class="dropdown-item" href="chauffeurs.html"><i class="ph ph-users-three me-2"></i>Chauffeurs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="vehiclesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ph ph-truck me-1"></i> Véhicules
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="vehiclesDropdown">
+            <li><a class="dropdown-item" href="vehicules.html"><i class="ph ph-list-checks me-2"></i>Parc automobile</a></li>
+            <li><a class="dropdown-item" href="maintenance.html"><i class="ph ph-wrench me-2"></i>Maintenance</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ph ph-gear me-1"></i> Administration
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+            <li><a class="dropdown-item" href="finance.html"><i class="ph ph-currency-circle-dollar me-2"></i>Finance</a></li>
+            <li><a class="dropdown-item" href="statistiques.html"><i class="ph ph-chart-line-up me-2"></i>Rapports</a></li>
+            <li><a class="dropdown-item" href="historique.html"><i class="ph ph-clock-counter-clockwise me-2"></i>Historique</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-sliders me-2"></i>Paramètres</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- User Menu -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=4e73df&color=fff" class="rounded-circle me-2" width="32" height="32" alt="Profil">
+            <span class="d-none d-lg-inline">Administrateur</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item" href="profile.html">
+                <i class="ph ph-user me-2"></i>Mon profil
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" href="#">
+                <i class="ph ph-sign-out me-2"></i>Déconnexion
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

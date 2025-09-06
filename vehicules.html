@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Véhicules | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- jQuery (required for Select2) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  
+  <!-- Custom CSS -->
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/pages/vehicules.css" rel="stylesheet">
+  <style>
+    /* Style pour l'en-tête de page */
+    body {
+      padding-top: 70px;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+    }
+    
+    /* Style pour les notifications toast */
+    .toast {
+      margin-bottom: 10px;
+      min-width: 250px;
+      opacity: 0.95;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    .toast.show {
+      display: block;
+      opacity: 1;
+    }
+    
+    .toast.hide {
+      opacity: 0;
+    }
+    
+    main.container {
+      background: white;
+      margin: 0 auto 2rem;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      max-width: 98%;
+    }
+    
+    /* Style pour le bouton d'ajout */
+    .btn-primary {
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .d-flex.justify-content-between.align-items-center.mb-4 h1 {
+      margin-bottom: 0;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    .form-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .image-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      border: 2px dashed #dee2e6;
+      overflow: hidden;
+    }
+    .image-preview i {
+      font-size: 2.5rem;
+      color: #6c757d;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+    .search-box input {
+      padding-left: 40px;
+    }
+    
+    /* Style temporaire pour le bouton d'ajout */
+    .btn-ajouter-vehicule {
+      background-color: #ff0000 !important;
+      color: white !important;
+      border: 3px solid yellow !important;
+      padding: 15px 30px !important;
+      font-size: 1.5rem !important;
+      position: fixed !important;
+      top: 100px !important;
+      right: 20px !important;
+      z-index: 9999 !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+  </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet"></head>
+<body>
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  
+  
+  <!-- Navigation -->
+  <script src="public/js/modules/include-navbar.js"></script>
+
+  <main class="container py-4">
+    <!-- En-tête de page -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">
+        <i class="ph ph-truck me-2"></i>Gestion des Véhicules
+      </h1>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vehiculeModal" style="position: relative; z-index: 1000; background-color: #0d6efd !important; color: white !important; padding: 8px 16px !important; border: none !important; border-radius: 4px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; margin-left: 20px;">
+        <i class="ph ph-plus me-1"></i> Ajouter un véhicule
+      </button>
+    </div>
+
+    <!-- Filtres de recherche -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="search-box">
+              <i class="ph ph-magnifying-glass"></i>
+              <input type="text" class="form-control" id="searchVehicule" placeholder="Rechercher un véhicule...">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="filterStatus">
+              <option value="">Tous les statuts</option>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+              <option value="maintenance">En maintenance</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-outline-secondary w-100" id="resetFilters">
+              <i class="ph ph-arrow-counter-clockwise me-1"></i> Réinitialiser
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cartes de statistiques -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="ph ph-truck text-primary" style="font-size: 2rem;"></i>
+          <div class="h3 my-2" id="totalVehicules">0</div>
+          <div class="text-muted">Véhicules enregistrés</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="ph ph-check-circle text-success" style="font-size: 2rem;"></i>
+          <div class="h3 my-2" id="vehiculesActifs">0</div>
+          <div class="text-muted">Véhicules actifs</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="ph ph-wrench text-warning" style="font-size: 2rem;"></i>
+          <div class="h3 my-2" id="vehiculesMaintenance">0</div>
+          <div class="text-muted">En maintenance</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <i class="ph ph-clock text-secondary" style="font-size: 2rem;"></i>
+          <div class="h3 my-2" id="vehiculesInactifs">0</div>
+          <div class="text-muted">Véhicules inactifs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau des véhicules -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" id="vehiculeTable">
+            <thead class="table-light">
+              <tr>
+                <th>Photo</th>
+                <th>Matricule</th>
+                <th>Marque & Modèle</th>
+                <th>Type</th>
+                <th>Chauffeur</th>
+                <th>Statut</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="ph ph-truck" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">Aucun véhicule enregistré</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Ajouter/Modifier un véhicule -->
+  <div class="modal fade" id="vehiculeModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Ajouter un véhicule</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="vehiculeForm">
+          <div class="modal-body">
+            <input type="hidden" id="vehiculeId">
+            
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-section">
+                  <div class="image-preview" id="photoPreview">
+                    <i class="ph ph-truck"></i>
+                  </div>
+                  <div class="text-center">
+                    <input type="file" id="photo" accept="image/*" class="d-none" onchange="previewImage(this)">
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('photo').click()">
+                      <i class="ph ph-upload"></i> Téléverser une photo
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-section">
+                  <h6 class="form-section-title">
+                    <i class="ph ph-identification-card"></i> Informations générales
+                  </h6>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="matricule" class="form-label">Matricule <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="matricule" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="marque" class="form-label">Marque <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="marque" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="modele" class="form-label">Modèle <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="modele" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="typeVehicule" class="form-label">Type de véhicule</label>
+                      <select class="form-select select2" id="typeVehicule">
+                        <option value="">Sélectionner un type</option>
+                        <option value="minibus">Minibus</option>
+                        <option value="bus">Bus</option>
+                        <option value="van">Van</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="annee" class="form-label">Année</label>
+                      <input type="number" class="form-control" id="annee" min="1900" max="2099" step="1">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="couleur" class="form-label">Couleur</label>
+                      <input type="text" class="form-control" id="couleur">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="numeroChassis" class="form-label">Numéro de châssis</label>
+                      <input type="text" class="form-control" id="numeroChassis">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="statut" class="form-label">Statut</label>
+                      <select class="form-select" id="statut">
+                        <option value="actif">Actif</option>
+                        <option value="inactif">Inactif</option>
+                        <option value="maintenance">En maintenance</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h6 class="form-section-title">
+                <i class="ph ph-gear"></i> Spécifications techniques
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="nombrePlaces" class="form-label">Nombre de places</label>
+                  <input type="number" class="form-control" id="nombrePlaces" min="1">
+                </div>
+                <div class="col-md-4">
+                  <label for="chauffeurAssigné" class="form-label">Chauffeur assigné</label>
+                  <select class="form-select select2" id="chauffeurAssigné">
+                    <option value="">Aucun chauffeur assigné</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="kilometrage" class="form-label">Kilométrage</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="kilometrage" min="0" step="1">
+                    <span class="input-group-text">km</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="dateDernierControle" class="form-label">Date du dernier contrôle technique</label>
+                  <input type="date" class="form-control" id="dateDernierControle">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h6 class="form-section-title">
+                <i class="ph ph-note"></i> Notes
+              </h6>
+              <div class="mb-3">
+                <label for="notes" class="form-label">Informations supplémentaires</label>
+                <textarea class="form-control" id="notes" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de suppression -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="/js/modules/vehicules/vehicules.js" type="module"></script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

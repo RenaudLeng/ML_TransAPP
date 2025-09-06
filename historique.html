@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historique | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  
+  <!-- Custom CSS -->
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/pages/historique.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --card-border-radius: 12px;
+      --card-padding: 1.25rem;
+      --transition-speed: 0.3s;
+    }
+    
+    .activity-card {
+      border-radius: var(--card-border-radius);
+      padding: var(--card-padding);
+      transition: all var(--transition-speed) ease;
+      border-left: 4px solid;
+      margin-bottom: 1rem;
+    }
+    
+    .activity-receipt {
+      border-left-color: #198754;
+      background-color: rgba(25, 135, 84, 0.05);
+    }
+    
+    .activity-expense {
+      border-left-color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.05);
+    }
+    
+    .activity-maintenance {
+      border-left-color: #fd7e14;
+      background-color: rgba(253, 126, 20, 0.05);
+    }
+    
+    .activity-other {
+      border-left-color: #6f42c1;
+      background-color: rgba(111, 66, 193, 0.05);
+    }
+    
+    .activity-date {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .activity-amount {
+      font-weight: 600;
+    }
+    
+    .activity-bus {
+      font-weight: 500;
+      color: #0d6efd;
+    }
+    
+    .filter-section {
+      background-color: #f8f9fa;
+      border-radius: var(--card-border-radius);
+      padding: var(--card-padding);
+      margin-bottom: 1.5rem;
+    }
+    
+    .no-activity {
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+    }
+    
+    @media (max-width: 768px) {
+      .filter-section .row > div {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+  <link href="public/css/components/navbar.css" rel="stylesheet">
+
+  <link href="/css/pages/style.css" rel="stylesheet"></head>
+<body class="light-mode">
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <!-- NAVBAR -->
+  <!-- Barre de navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <span class="logo-mlapp">ML</span>
+      <span>Transport</span>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="bus.html">
+            <i class="ph ph-bus"></i> Bus
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="finance.html">
+            <i class="ph ph-currency-dollar"></i> Finance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chauffeurs.html">
+            <i class="ph ph-users"></i> Chauffeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="statistiques.html">
+            <i class="ph ph-chart-bar"></i> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="maintenance.html">
+            <i class="ph ph-wrench"></i> Maintenance
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="ph ph-user-circle fs-4 me-2"></i>
+            <span id="username">Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+        <li class="nav-item ms-2">
+          <button class="btn btn-link nav-link" id="themeToggle">
+            <i class="ph ph-moon" id="themeIcon"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <!-- CONTENU -->
+  <main class="container mt-5 pt-5 pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">
+        <i class="ph ph-clock-countdown me-2"></i> Historique des Activités Financières
+      </h1>
+      <div>
+        <button class="btn btn-outline-secondary me-2" id="exportBtn" title="Exporter l'historique">
+          <i class="ph ph-export"></i> Exporter
+        </button>
+        <button class="btn btn-outline-danger" id="clearHistoryBtn" title="Effacer tout l'historique">
+          <i class="ph ph-trash"></i> Vider l'historique
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtres avancés -->
+    <div class="card mb-4">
+      <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="ph ph-funnel-simple me-2"></i>Filtres avancés</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="filterType" class="form-label">Type d'action</label>
+            <select class="form-select" id="filterType">
+              <option value="">Toutes les actions</option>
+              <option value="creation">Création</option>
+              <option value="modification">Modification</option>
+              <option value="suppression">Suppression</option>
+              <option value="validation">Validation</option>
+              <option value="annulation">Annulation</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="busSelect" class="form-label">Bus</label>
+            <select class="form-select" id="busSelect">
+              <option value="">Tous les bus</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filterEntity" class="form-label">Élément</label>
+            <select class="form-select" id="filterEntity">
+              <option value="">Tous les éléments</option>
+              <option value="recette">Recette</option>
+              <option value="depense">Dépense</option>
+              <option value="utilisateur">Utilisateur</option>
+              <option value="bus">Bus</option>
+              <option value="categorie">Catégorie</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filterDateDebut" class="form-label">Date de début</label>
+            <input type="date" class="form-control" id="filterDateDebut">
+          </div>
+          <div class="col-md-3">
+            <label for="filterDateFin" class="form-label">Date de fin</label>
+            <div class="input-group">
+              <input type="date" class="form-control" id="filterDateFin">
+              <button class="btn btn-outline-secondary" type="button" id="resetDateBtn" title="Réinitialiser les dates">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="input-group">
+              <span class="input-group-text"><i class="ph ph-magnifying-glass"></i></span>
+              <input type="text" class="form-control" id="searchInput" placeholder="Rechercher dans les détails...">
+              <button class="btn btn-primary" type="button" id="searchBtn">
+                <i class="ph ph-magnifying-glass"></i> Rechercher
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary bg-opacity-10 border-primary">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Total des actions</h6>
+            <h3 class="card-title mb-0" id="totalActions">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-success bg-opacity-10 border-success">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Créations</h6>
+            <h3 class="card-title mb-0" id="creationsCount">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-warning bg-opacity-10 border-warning">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Modifications</h6>
+            <h3 class="card-title mb-0" id="modificationsCount">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-danger bg-opacity-10 border-danger">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">Suppressions</h6>
+            <h3 class="card-title mb-0" id="deletionsCount">0</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des activités -->
+    <div class="card">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="ph ph-list-bullets me-2"></i>Dernières activités</h5>
+        <div class="d-flex align-items-center">
+          <div class="form-check form-switch me-3">
+            <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+            <label class="form-check-label" for="autoRefresh">Actualisation automatique</label>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="itemsPerPageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              50 éléments par page
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="itemsPerPageDropdown">
+              <li><a class="dropdown-item" href="#" data-value="10">10 éléments</a></li>
+              <li><a class="dropdown-item active" href="#" data-value="50">50 éléments</a></li>
+              <li><a class="dropdown-item" href="#" data-value="100">100 éléments</a></li>
+              <li><a class="dropdown-item" href="#" data-value="250">250 éléments</a></li>
+              <li><a class="dropdown-item" href="#" data-value="500">500 éléments</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 150px;">
+                  <a href="#" class="text-dark sortable" data-sort="timestamp">
+                    Date/Heure <i class="ph ph-arrow-down ms-1"></i>
+                  </a>
+                </th>
+                <th style="width: 120px;">
+                  <a href="#" class="text-dark sortable" data-sort="type">
+                    Action
+                  </a>
+                </th>
+                <th style="width: 120px;">
+                  <a href="#" class="text-dark sortable" data-sort="entite">
+                    Élément
+                  </a>
+                </th>
+                <th>
+                  <a href="#" class="text-dark sortable" data-sort="details">
+                    Détails
+                  </a>
+                </th>
+                <th style="width: 150px;">
+                  <a href="#" class="text-dark sortable" data-sort="utilisateur">
+                    Utilisateur
+                  </a>
+                </th>
+                <th style="width: 100px;" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="activitiesList">
+              <!-- Les activités seront chargées ici via JavaScript -->
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement de l'historique...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+        <div class="text-muted small" id="paginationInfo">
+          Affichage de <span id="startItem">0</span> à <span id="endItem">0</span> sur <span id="totalItems">0</span> entrées
+        </div>
+        <nav aria-label="Navigation de l'historique">
+          <ul class="pagination pagination-sm mb-0" id="pagination">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" id="prevPage" aria-label="Précédent">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#" id="nextPage" aria-label="Suivant">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer class="text-center py-3 bg-dark text-white">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <span>Powered by Forever/&gt;Inc</span>
+        <span class="small">Dernière mise à jour: <span id="lastUpdate"></span></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/modules/historique/historique.js" type="module"></script>
+  <script>
+    // Récupérer les données depuis le localStorage
+    function getAvailableBuses() {
+      return JSON.parse(localStorage.getItem('busList')) || [
+        { matricule: 'AK678AA', nom: 'Bus Principal' },
+        { matricule: 'AK679BB', nom: 'Bus Secondaire' },
+        { matricule: 'AK680CC', nom: 'Bus de Réserve' }
+      ];
+    }
+
+    function getRecettes() {
+      return JSON.parse(localStorage.getItem('recettes')) || [];
+    }
+
+    function getDepenses() {
+      return JSON.parse(localStorage.getItem('depenses')) || [];
+    }
+
+    function getActivities() {
+      return JSON.parse(localStorage.getItem('activities')) || [];
+    }
+
+    // Formater une date
+    function formatDate(dateString) {
+      const options = { 
+        weekday: 'short', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      return new Date(dateString).toLocaleDateString('fr-FR', options);
+    }
+
+    // Afficher les activités
+    function displayActivities() {
+      // Récupérer les éléments du DOM avec des valeurs par défaut sécurisées
+      const busSelect = document.getElementById('busSelect') || { value: '' };
+      const typeSelect = document.getElementById('typeSelect') || { value: '' };
+      const dateRange = document.getElementById('dateRange') || { value: 'all' };
+      const searchInput = document.getElementById('searchInput') || { value: '' };
+      const activitiesList = document.getElementById('activitiesList');
+
+      // Vérifier que l'élément activitiesList existe
+      if (!activitiesList) {
+        console.error('Élément activitiesList introuvable dans le DOM');
+        return;
+      }
+
+      // Récupérer les valeurs des filtres avec des valeurs par défaut sécurisées
+      const selectedBus = busSelect.value || '';
+      const selectedType = typeSelect.value || '';
+      const selectedDateRange = dateRange.value || 'all';
+      const searchTerm = (searchInput.value || '').toLowerCase();
+
+      // Récupérer toutes les données
+      const buses = getAvailableBuses();
+      const recettes = getRecettes();
+      const depenses = getDepenses();
+      const activities = getActivities();
+
+      // Fusionner toutes les activités
+      const allActivities = [];
+      
+      // Ajouter les recettes
+      recettes.forEach(recette => {
+        allActivities.push({
+          type: 'recette',
+          date: recette.date,
+          bus: recette.matricule,
+          description: recette.commentaire || 'Recette bus',
+          montant: recette.montant,
+          details: `Recette de ${recette.montant} XAF`
+        });
+      });
+
+      // Ajouter les dépenses
+      depenses.forEach(depense => {
+        allActivities.push({
+          type: depense.type === 'bus' ? 'depense_bus' : 'depense_entreprise',
+          date: depense.date,
+          bus: depense.bus || null,
+          description: depense.motif,
+          montant: -Math.abs(depense.montant), // Montant négatif pour les dépenses
+          details: depense.details || `Dépense: ${depense.motif}`
+        });
+      });
+
+      // Ajouter les autres activités
+      activities.forEach(activity => {
+        allActivities.push({
+          type: activity.type || 'autre',
+          date: activity.date,
+          bus: activity.matricule,
+          description: activity.description,
+          montant: activity.montant || 0,
+          details: activity.details || ''
+        });
+      });
+
+      // Filtrer les activités
+      let filteredActivities = allActivities.filter(activity => {
+        // Filtre par bus
+        if (selectedBus && activity.bus !== selectedBus) return false;
+        
+        // Filtre par type
+        if (selectedType) {
+          if (selectedType === 'recette' && activity.type !== 'recette') return false;
+          if (selectedType === 'depense' && !activity.type.includes('depense')) return false;
+          if (selectedType === 'maintenance' && activity.type !== 'maintenance') return false;
+          if (selectedType === 'autre' && !['maintenance', 'recette', 'depense'].includes(activity.type)) return false;
+        }
+        
+        // Filtre par période
+        const activityDate = new Date(activity.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDateRange === 'today' && activityDate < today) return false;
+        if (selectedDateRange === 'week') {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          if (activityDate < weekAgo) return false;
+        }
+        if (selectedDateRange === 'month') {
+          const monthAgo = new Date();
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          if (activityDate < monthAgo) return false;
+        }
+        if (selectedDateRange === 'last-month') {
+          const startLastMonth = new Date();
+          startLastMonth.setMonth(startLastMonth.getMonth() - 1, 1);
+          startLastMonth.setHours(0, 0, 0, 0);
+          const endLastMonth = new Date();
+          endLastMonth.setMonth(endLastMonth.getMonth(), 0);
+          endLastMonth.setHours(23, 59, 59, 999);
+          if (activityDate < startLastMonth || activityDate > endLastMonth) return false;
+        }
+        
+        // Filtre par recherche
+        if (searchTerm && 
+            !activity.description.toLowerCase().includes(searchTerm) && 
+            !activity.details.toLowerCase().includes(searchTerm)) {
+          return false;
+        }
+        
+        return true;
+      });
+
+      // Trier par date (plus récent en premier)
+      filteredActivities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Afficher les résultats
+      if (filteredActivities.length === 0) {
+        activitiesList.innerHTML = `
+          <div class="no-activity">
+            <i class="ph ph-magnifying-glass fs-1 mb-3"></i>
+            <p class="lead">Aucune activité trouvée</p>
+            <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Créer le HTML des activités
+      let activitiesHTML = '';
+      
+      filteredActivities.forEach(activity => {
+        // Trouver le nom du bus
+        const busInfo = buses.find(b => b.matricule === activity.bus) || {};
+        const busName = busInfo.nom ? `${busInfo.nom} (${activity.bus})` : activity.bus || 'Non spécifié';
+
+        // Déterminer la classe CSS en fonction du type
+        let activityClass = 'activity-other';
+        if (activity.type === 'recette') activityClass = 'activity-receipt';
+        else if (activity.type.includes('depense')) activityClass = 'activity-expense';
+        else if (activity.type === 'maintenance') activityClass = 'activity-maintenance';
+
+        activitiesHTML += `
+          <div class="activity-card ${activityClass}">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <strong>${activity.description}</strong>
+                <div class="activity-date">${formatDate(activity.date)}</div>
+              </div>
+              <div class="activity-amount text-end">
+                ${activity.montant >= 0 ? '+' : ''}${activity.montant.toLocaleString()} XAF
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+              <small class="activity-bus">
+                <i class="ph ph-bus"></i> ${busName}
+              </small>
+              <small class="text-muted">
+                ${activity.type.replace('_', ' ').toUpperCase()}
+              </small>
+            </div>
+            ${activity.details ? `<div class="mt-2 small">${activity.details}</div>` : ''}
+          </div>
+        `;
+      });
+
+      activitiesList.innerHTML = activitiesHTML;
+    }
+
+    // Initialiser la page
+    function initPage() {
+      // Remplir la liste des bus
+      const busSelect = document.getElementById('busSelect');
+      if (busSelect) {
+        try {
+          const buses = getAvailableBuses();
+          
+          // Vérifier que buses est bien un tableau avant d'appeler forEach
+          if (Array.isArray(buses)) {
+            buses.forEach(bus => {
+              if (bus && bus.matricule && bus.nom) {  // Vérifier que l'objet bus a les propriétés nécessaires
+                const option = document.createElement('option');
+                option.value = bus.matricule;
+                option.textContent = `${bus.nom} (${bus.matricule})`;
+                busSelect.appendChild(option);
+              }
+            });
+          } else {
+            console.warn('La fonction getAvailableBuses() n\'a pas retourné un tableau valide');
+          }
+
+          // Configurer les événements liés aux bus
+          busSelect.addEventListener('change', displayActivities);
+        } catch (error) {
+          console.error('Erreur lors du chargement de la liste des bus:', error);
+        }
+      }
+
+      // Configurer les autres événements
+      const typeSelect = document.getElementById('typeSelect');
+      const dateRange = document.getElementById('dateRange');
+      const searchInput = document.getElementById('searchInput');
+      const resetFilters = document.getElementById('resetFilters');
+      
+      if (typeSelect) typeSelect.addEventListener('change', displayActivities);
+      if (dateRange) dateRange.addEventListener('change', displayActivities);
+      if (searchInput) searchInput.addEventListener('input', displayActivities);
+      
+      if (resetFilters) {
+        resetFilters.addEventListener('click', () => {
+          if (busSelect) busSelect.value = '';
+          if (typeSelect) typeSelect.value = '';
+          if (dateRange) dateRange.value = 'all';
+          if (searchInput) searchInput.value = '';
+          displayActivities();
+        });
+      }
+
+      // Afficher la date de mise à jour
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      // Afficher les activités
+      displayActivities();
+    }
+
+    // Lancer l'initialisation quand la page est chargée
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+
+  <script src="public/js/modules/include-navbar.js"></script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

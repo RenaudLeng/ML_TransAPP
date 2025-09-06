@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tableau de bord | ML TRANSPORT</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/icons.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/public/css/main.css">
+  <link rel="stylesheet" href="/public/css/components/sidebar.css">
+  <link rel="stylesheet" href="/public/css/layout.css">
+  
+  <style>
+    :root {
+      --gradient-primary: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+      --gradient-success: linear-gradient(135deg, #198754 0%, #20c997 100%);
+      --gradient-danger: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+      --gradient-warning: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+      --gradient-info: linear-gradient(135deg, #0dcaf0 0%, #20c997 100%);
+      --gradient-dark: linear-gradient(135deg, #212529 0%, #495057 100%);
+      --gradient-purple: linear-gradient(135deg, #6f42c1 0%, #d63384 100%);
+      --gradient-secondary: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
+    }
+    
+    .dashboard-card {
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: 100%;
+      color: white;
+      position: relative;
+      z-index: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--card-gradient);
+      z-index: -1;
+      opacity: 0.9;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover::before {
+      opacity: 1;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .card-icon {
+      font-size: 1.75rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .card-body {
+      flex: 1;
+      padding: 0;
+    }
+    
+    .card-description {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-footer {
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-top: auto;
+    }
+    
+    .card-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    
+    .card-link:hover {
+      transform: translateX(5px);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1399.98px) {
+      .card-title {
+        font-size: 1.1rem;
+      }
+      
+      .card-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 1199.98px) {
+      .card-title {
+        font-size: 1rem;
+      }
+      
+      .card-description {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Conteneur pour la barre de navigation -->
+    <div id="navbar-container"></div>
+    
+    <!-- Conteneur pour le contenu principal -->
+    <div class="main-wrapper">
+      <!-- La sidebar sera injectée ici -->
+      <div id="sidebar-container"></div>
+      
+      <!-- Contenu principal -->
+      <div class="main-content">
+  
+  <!-- En-tête fixe -->
+  <header class="app-header">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark d-md-none me-3" id="sidebarToggle">
+          <i class="ph ph-list"></i>
+        </button>
+        <h1 class="h4 mb-0 text-gray-800">Tableau de bord</h1>
+      </div>
+      <div class="d-flex align-items-center">
+        <div class="dropdown me-3">
+          <a class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ph ph-bell me-1"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Notifications</h6></li>
+            <li><a class="dropdown-item" href="#">Nouveau message reçu</a></li>
+            <li><a class="dropdown-item" href="#">Maintenance prévue demain</a></li>
+            <li><a class="dropdown-item" href="#">Mise à jour disponible</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-center" href="#">Voir toutes les notifications</a></li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <a class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=4e73df&color=fff" class="rounded-circle me-2" width="32" height="32" alt="Profil">
+            <span class="d-none d-md-inline">Administrateur</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="ph ph-user me-2"></i>Profil</a></li>
+            <li><a class="dropdown-item" href="#"><i class="ph ph-gear me-2"></i>Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="ph ph-sign-out me-2"></i>Déconnexion</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main class="main-content fade-in" id="mainContent">
+    <div class="content-container">
+      <!-- En-tête avec titre et date -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 mb-0 text-gray-800"><i class="ph ph-gauge me-2"></i>Tableau de bord administrateur</h1>
+          <p class="text-muted mb-0">Vue d'ensemble de votre activité et accès rapide</p>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="me-3 text-end">
+            <div id="current-time" class="h5 mb-0 text-gray-800">--:--:--</div>
+            <div id="current-date-display" class="small text-muted">--/--/----</div>
+          </div>
+          <div class="bg-primary bg-opacity-10 p-2 rounded">
+            <i class="ph ph-calendar-blank text-primary" style="font-size: 2rem;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cartes de statistiques -->
+      <div class="row g-4 mb-4">
+        <!-- Carte Véhicules -->
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-start border-primary border-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Véhicules</h6>
+                  <h2 class="mb-0">24</h2>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                  <i class="ph ph-truck text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span class="badge bg-success">+2.5%</span>
+                <span class="text-muted small ms-1">vs mois dernier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Carte Chauffeurs -->
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-start border-success border-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Chauffeurs</h6>
+                  <h2 class="mb-0">18</h2>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded">
+                  <i class="ph ph-users-three text-success" style="font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span class="badge bg-success">+5.8%</span>
+                <span class="text-muted small ms-1">vs mois dernier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Carte Maintenance -->
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-start border-warning border-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Maintenances</h6>
+                  <h2 class="mb-0">7</h2>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded">
+                  <i class="ph ph-wrench text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span class="badge bg-danger">-1.2%</span>
+                <span class="text-muted small ms-1">vs mois dernier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Carte Revenus -->
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-start border-info border-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-uppercase text-muted mb-1">Revenus</h6>
+                  <h2 class="mb-0">42.5k€</h2>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded">
+                  <i class="ph ph-currency-circle-dollar text-info" style="font-size: 1.5rem;"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span class="badge bg-success">+12.3%</span>
+                <span class="text-muted small ms-1">vs mois dernier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu principal -->
+      <div class="row g-4 mb-4">
+        <!-- Section Opérations -->
+        <div class="col-12">
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+              <h5 class="mb-0"><i class="ph ph-clipboard-text me-2 text-primary"></i>Opérations</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-4">
+                <!-- Planning -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="planning.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-calendar-blank text-primary" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Planning</h5>
+                        <p class="text-muted small mb-0">Gérez les plannings et affectations</p>
+                        <div class="mt-3">
+                          <span class="badge bg-primary bg-opacity-10 text-primary">12 en cours</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Chauffeurs -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="chauffeurs.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-users-three text-success" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Chauffeurs</h5>
+                        <p class="text-muted small mb-0">Gérez vos équipes de conducteurs</p>
+                        <div class="mt-3">
+                          <span class="badge bg-success bg-opacity-10 text-success">18 actifs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Véhicules -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="vehicules.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-truck text-warning" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Parc Auto</h5>
+                        <p class="text-muted small mb-0">Gérez votre flotte de véhicules</p>
+                        <div class="mt-3">
+                          <span class="badge bg-warning bg-opacity-10 text-warning">24 véhicules</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Maintenance -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="maintenance.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-wrench text-danger" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Maintenance</h5>
+                        <p class="text-muted small mb-0">Suivez les entretiens et réparations</p>
+                        <div class="mt-3">
+                          <span class="badge bg-danger bg-opacity-10 text-danger">7 en cours</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section Administration -->
+        <div class="col-12 mt-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom py-3">
+              <h5 class="mb-0"><i class="ph ph-gear me-2 text-primary"></i>Administration</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-4">
+                <!-- Finance -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="finance.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-purple bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-currency-circle-dollar text-purple" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Finance</h5>
+                        <p class="text-muted small mb-0">Gérez les revenus et dépenses</p>
+                        <div class="mt-3">
+                          <span class="badge bg-purple bg-opacity-10 text-purple">42.5k€</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Rapports -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="statistiques.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-info bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-chart-line-up text-info" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Rapports</h5>
+                        <p class="text-muted small mb-0">Analysez les performances</p>
+                        <div class="mt-3">
+                          <span class="badge bg-info bg-opacity-10 text-info">5 nouveaux</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Historique -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="historique.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-clock-counter-clockwise text-secondary" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Historique</h5>
+                        <p class="text-muted small mb-0">Consultez les activités passées</p>
+                        <div class="mt-3">
+                          <span class="badge bg-secondary bg-opacity-10 text-secondary">1.2k entrées</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                
+                <!-- Paramètres -->
+                <div class="col-md-6 col-lg-3">
+                  <a href="parametres.html" class="text-decoration-none">
+                    <div class="card h-100 border-0 hover-shadow-sm">
+                      <div class="card-body text-center">
+                        <div class="bg-dark bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                          <i class="ph ph-sliders text-dark" style="font-size: 1.75rem;"></i>
+                        </div>
+                        <h5 class="h5 mb-2">Paramètres</h5>
+                        <p class="text-muted small mb-0">Personnalisez l'application</p>
+                        <div class="mt-3">
+                          <span class="badge bg-dark bg-opacity-10 text-dark">Admin</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activités récentes et statut -->
+      <div class="row g-4">
+        <!-- Activités récentes -->
+        <div class="col-lg-8">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-white border-bottom py-3">
+              <h5 class="mb-0"><i class="ph ph-list-checks me-2 text-primary"></i>Activités récentes</h5>
+            </div>
+            <div class="card-body">
+              <div class="list-group list-group-flush">
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                      <i class="ph ph-check-circle text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Nouvelle mission planifiée</h6>
+                      <p class="text-muted small mb-0">Mission #2456 pour Client Entreprise SA</p>
+                      <small class="text-muted">Il y a 5 minutes</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+                      <i class="ph ph-warning text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Alerte maintenance</h6>
+                      <p class="text-muted small mb-0">Véhicule #12 nécessite une révision</p>
+                      <small class="text-muted">Il y a 1 heure</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+                      <i class="ph ph-currency-circle-dollar text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Paiement reçu</h6>
+                      <p class="text-muted small mb-0">Facture #7890 payée par Client Groupe</p>
+                      <small class="text-muted">Il y a 3 heures</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-end mt-3">
+                <a href="#" class="btn btn-sm btn-outline-primary">Voir toutes les activités</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Statut des véhicules -->
+        <div class="col-lg-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-white border-bottom py-3">
+              <h5 class="mb-0"><i class="ph ph-car me-2 text-primary"></i>Statut des véhicules</h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <canvas id="vehicleStatusChart" height="200"></canvas>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="small">En service</span>
+                  <span class="small fw-bold">18 (75%)</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="small">En maintenance</span>
+                  <span class="small fw-bold">4 (17%)</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: 17%" aria-valuenow="17" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="small">Hors service</span>
+                  <span class="small fw-bold">2 (8%)</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: 8%" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-info h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Maintenances ce mois</div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800">7</div>
+                </div>
+                <div class="icon-circle bg-info">
+                  <i class="ph ph-wrench text-white"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-warning h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Alertes</div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800">3</div>
+                </div>
+                <div class="icon-circle bg-warning">
+                  <i class="ph ph-warning text-white"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Navigation Grid -->
+      <div class="mb-5">
+        <h2 class="h4 text-gray-800 mb-4">Menu principal</h2>
+        
+        <!-- Section Opérations -->
+        <div class="mb-4">
+          <h3 class="h5 text-muted mb-3 border-bottom pb-2">Opérations</h3>
+          <div class="row g-4">
+            <!-- Planning Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="planning.html" class="text-decoration-none" aria-label="Accéder au planning des missions">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-primary)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-calendar-check"></i>
+                    </div>
+                    <h3 class="card-title">Planning</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Gestion des missions et affectations des véhicules
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Voir le planning
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Chauffeurs Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="chauffeurs.html" class="text-decoration-none" aria-label="Gérer les chauffeurs">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-info)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-users-three"></i>
+                    </div>
+                    <h3 class="card-title">Chauffeurs</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Gestion des conducteurs et de leurs plannings
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Gérer l'équipe
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Véhicules -->
+        <div class="mb-4">
+          <h3 class="h5 text-muted mb-3 border-bottom pb-2">Véhicules</h3>
+          <div class="row g-4">
+            <!-- Parc Auto Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="vehicules.html" class="text-decoration-none" aria-label="Gérer le parc automobile">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-primary)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-truck"></i>
+                    </div>
+                    <h3 class="card-title">Parc Auto</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Gestion du parc automobile et suivi des véhicules
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Voir les véhicules
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Maintenance Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="maintenance.html" class="text-decoration-none" aria-label="Gérer la maintenance">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-warning)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-wrench"></i>
+                    </div>
+                    <h3 class="card-title">Maintenance</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Suivi des entretiens et réparations des véhicules
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Voir le planning
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Administration -->
+        <div class="mb-4">
+          <h3 class="h5 text-muted mb-3 border-bottom pb-2">Administration</h3>
+          <div class="row g-4">
+            <!-- Finance Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="finance.html" class="text-decoration-none" aria-label="Accéder à la gestion financière">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-success)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-currency-circle-dollar"></i>
+                    </div>
+                    <h3 class="card-title">Finance</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Gestion des coûts, facturation et rapports financiers
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Tableau de bord
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Rapports Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="statistiques.html" class="text-decoration-none" aria-label="Voir les rapports">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-purple)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-chart-line-up"></i>
+                    </div>
+                    <h3 class="card-title">Rapports</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Tableaux de bord et analyses des performances
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Voir les rapports
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Historique Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="historique.html" class="text-decoration-none" aria-label="Consulter l'historique">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-secondary)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-clock-counter-clockwise"></i>
+                    </div>
+                    <h3 class="card-title">Historique</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Consultation des activités et interventions passées
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Voir l'historique
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Paramètres Card -->
+            <div class="col-md-6 col-lg-4 col-xl-3">
+              <a href="parametres.html" class="text-decoration-none" aria-label="Accéder aux paramètres">
+                <div class="dashboard-card" style="--card-gradient: var(--gradient-dark)">
+                  <div class="card-header">
+                    <div class="card-icon">
+                      <i class="ph ph-gear-six"></i>
+                    </div>
+                    <h3 class="card-title">Paramètres</h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-description">
+                      Configuration du système et préférences utilisateur
+                    </p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-link">
+                      Configurer
+                      <i class="ph ph-arrow-right ms-2" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Recent Activities -->
+      <div class="row mt-4">
+        <div class="col-lg-8 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+              <h6 class="m-0 font-weight-bold text-primary">Activités récentes</h6>
+              <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ph ph-dots-three-outline text-gray-400"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#">Tout afficher</a></li>
+                  <li><a class="dropdown-item" href="#">Aujourd'hui</a></li>
+                  <li><a class="dropdown-item" href="#">Cette semaine</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Paramètres des notifications</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="activity-feed">
+                <div class="activity-item d-flex mb-4">
+                  <div class="activity-badge bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="ph ph-truck"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-1">Nouveau véhicule ajouté</h6>
+                      <small class="text-muted">Il y a 5 min</small>
+                    </div>
+                    <p class="mb-0 small">Renault Trafic - Immatriculation: AB-123-CD</p>
+                  </div>
+                </div>
+                
+                <div class="activity-item d-flex mb-4">
+                  <div class="activity-badge bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="ph ph-wrench"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-1">Maintenance effectuée</h6>
+                      <small class="text-muted">Il y a 2 heures</small>
+                    </div>
+                    <p class="mb-0 small">Véhicule #VH-789 - Vidange et révision complète</p>
+                  </div>
+                </div>
+                
+                <div class="activity-item d-flex mb-4">
+                  <div class="activity-badge bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="ph ph-currency-circle-dollar"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-1">Nouvelle facture</h6>
+                      <small class="text-muted">Aujourd'hui, 09:30</small>
+                    </div>
+                    <p class="mb-0 small">Facture #INV-2023-045 - Client: Transports Dupont</p>
+                  </div>
+                </div>
+                
+                <div class="activity-item d-flex">
+                  <div class="activity-badge bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="ph ph-warning"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="d-flex justify-content-between">
+                      <h6 class="mb-1">Alerte maintenance</h6>
+                      <small class="text-muted">Hier, 16:45</small>
+                    </div>
+                    <p class="mb-0 small">Véhicule #VH-456 - Prochaine révision dans 500km</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 text-end">
+              <a href="#" class="btn btn-sm btn-link text-primary p-0">Voir toutes les activités</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Vehicle Status -->
+        <div class="col-lg-4 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Statut des véhicules</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="vehicleStatusChartDetail" height="200"></canvas>
+              <div class="mt-3 text-center">
+                <div class="d-flex justify-content-around">
+                  <div class="text-center">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase">En service</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase">Maintenance</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">4</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-xs font-weight-bold text-danger text-uppercase">Hors service</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="card shadow mt-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Actions rapides</h6>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-sm">
+                  <i class="ph ph-plus-circle me-1"></i> Nouveau véhicule
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                  <i class="ph ph-upload-simple me-1"></i> Importer des données
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                  <i class="ph ph-printer me-1"></i> Exporter le rapport
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Pied de page -->
+  <footer class="app-footer">
+    <div class="content-container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="#" class="d-flex align-items-center">
+            <i class="ph ph-info me-1"></i>
+            À propos
+          </a>
+          <a href="#" class="d-flex align-items-center">
+            <i class="ph ph-question me-1"></i>
+            Aide
+          </a>
+          <a href="#" class="d-flex align-items-center">
+            <i class="ph ph-file-text me-1"></i>
+            Documentation
+          </a>
+          <a href="#" class="d-flex align-items-center">
+            <i class="ph ph-shield-check me-1"></i>
+            Confidentialité
+          </a>
+          <a href="#" class="d-flex align-items-center">
+            <i class="ph ph-file-text me-1"></i>
+            Conditions d'utilisation
+          </a>
+        </div>
+        <div class="footer-info">
+          <span class="d-flex align-items-center">
+            <i class="ph ph-circle-fill text-success me-1"></i>
+            En ligne
+          </span>
+          <span>Version 1.0.0</span>
+          <span class="d-none d-md-inline">
+            <i class="ph ph-copyright me-1"></i>
+            2023 ML Transport
+          </span>
+          <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Aller en haut de page">
+            <i class="ph ph-arrow-up"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+
+  <!-- Scripts -->
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom Scripts -->
+  <script src="/public/js/modules/navbar.js"></script>
+  <script src="/public/js/dashboard.js"></script>
+  
+  <script>
+    // Fonction pour initialiser les tooltips
+    function initializeTooltips() {
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    }
+
+    // Fonction pour charger la barre de navigation
+    function loadNavbar() {
+      fetch('/partials/navbar.html')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erreur lors du chargement de la barre de navigation');
+          }
+          return response.text();
+        })
+        .then(html => {
+          const navbarContainer = document.getElementById('navbar-container');
+          if (navbarContainer) {
+            navbarContainer.innerHTML = html;
+            console.log('Barre de navigation chargée avec succès');
+            
+            // Initialiser la navbar après le chargement
+            if (window.initNavbar) {
+              window.initNavbar();
+            }
+            
+            // Initialiser les tooltips après le chargement de la navbar
+            initializeTooltips();
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+        });
+    }
+    
+    // Fonction pour charger la sidebar
+    function loadSidebar() {
+      fetch('/partials/sidebar.html')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erreur lors du chargement de la sidebar');
+          }
+          return response.text();
+        })
+        .then(html => {
+          const sidebarContainer = document.getElementById('sidebar-container');
+          if (sidebarContainer) {
+            sidebarContainer.innerHTML = html;
+            console.log('Sidebar chargée avec succès');
+            
+            // Initialiser les tooltips après le chargement de la sidebar
+            initializeTooltips();
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+        });
+    }
+    
+    // Initialisation du tableau de bord
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Initialisation du tableau de bord...');
+      
+      // Charger la navbar et la sidebar en parallèle
+      Promise.all([loadNavbar(), loadSidebar()])
+        .then(() => {
+          // Initialiser le contenu dynamique après le chargement des composants
+          if (window.initDynamicContent) {
+            window.initDynamicContent();
+          }
+          
+          console.log('Tableau de bord initialisé avec succès');
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des composants:', error);
+        });
+    });
+  </script>
+</body>
+</html>

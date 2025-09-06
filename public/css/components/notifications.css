@@ -1,0 +1,130 @@
+/* Conteneur de notifications */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    width: 100%;
+}
+
+/* Style de base de la notification */
+.notification {
+    position: relative;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    background: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Animation d'apparition */
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Animation de disparition */
+.notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Contenu de la notification */
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+/* Icône de notification */
+.notification-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* Bouton de fermeture */
+.notification-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    padding: 0;
+    margin-left: 15px;
+    line-height: 1;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+/* Barre de progression */
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    transform-origin: left;
+    transform: scaleX(1);
+    transition: transform linear;
+}
+
+/* Types de notifications */
+.notification.success {
+    background: #28a745;
+}
+
+.notification.error {
+    background: #dc3545;
+}
+
+.notification.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.notification.info {
+    background: #17a2b8;
+}
+
+.notification.loading {
+    background: #6c757d;
+}
+
+/* Animation de chargement */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.notification.loading .notification-icon {
+    animation: spin 1s linear infinite;
+}
+
+/* Styles pour les appareils mobiles */
+@media (max-width: 576px) {
+    #notification-container {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+    
+    .notification {
+        padding: 12px 15px;
+    }
+}

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maintenance | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+
+  <!-- CSS Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet"/>
+  
+  <!-- Custom CSS -->
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/forms.css" rel="stylesheet">
+  <link href="/css/components/cards.css" rel="stylesheet">
+  <link href="/css/pages/maintenance.css" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  
+  <!-- Chart.js pour les rapports -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Flatpickr pour les sélecteurs de date -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+  
+  <!-- Moment.js pour la gestion des dates -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.js"></script>
+  
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-light: #e7f1ff;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --success-light: #d1e7dd;
+      --danger-color: #dc3545;
+      --danger-light: #f8d7da;
+      --warning-color: #ffc107;
+      --warning-light: #fff3cd;
+      --info-color: #0dcaf0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --border-radius: 0.5rem;
+      --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s ease;
+    }
+    
+    body {
+      padding-top: 70px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: #f5f7fa;
+      color: #212529;
+      line-height: 1.6;
+    }
+    
+    .progress {
+      height: 10px;
+    }
+    
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 250px;
+      }
+    }
+  </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet"></head>
+<body class="light-mode">
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <!-- Navigation -->
+  <!-- Barre de navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <span class="logo-mlapp">ML</span>
+      <span>Transport</span>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="bus.html">
+            <i class="ph ph-bus"></i> Bus
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="finance.html">
+            <i class="ph ph-currency-dollar"></i> Finance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chauffeurs.html">
+            <i class="ph ph-users"></i> Chauffeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="statistiques.html">
+            <i class="ph ph-chart-bar"></i> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="maintenance.html">
+            <i class="ph ph-wrench"></i> Maintenance
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="ph ph-user-circle fs-4 me-2"></i>
+            <span id="username">Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  <!-- Conteneur pour les notifications -->
+  <div class="notifications-container position-fixed top-0 end-0 p-3" style="z-index: 1100"></div>
+  
+  <!-- Indicateur de chargement -->
+  <div id="loadingIndicator" class="position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-info d-none" style="z-index: 1100">
+    <i class="ph ph-spinner ph-spin me-2"></i> Chargement...
+  </div>
+  
+  <main class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        <!-- En-tête de page -->
+        <div class="page-header mb-5">
+          <h1>
+            <i class="ph ph-wrench"></i>
+            Gestion de Maintenance
+          </h1>
+        </div>
+        
+        <!-- Contrôles rapides -->
+        <div class="row mb-4">
+          <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="card-subtitle mb-1">En cours</h6>
+                    <h3 class="mb-0">12</h3>
+                  </div>
+                  <i class="ph ph-clock-countdown fs-1 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="card-subtitle mb-1">Terminées</h6>
+                    <h3 class="mb-0">48</h3>
+                  </div>
+                  <i class="ph ph-check-circle fs-1 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="card-subtitle mb-1">En attente</h6>
+                    <h3 class="mb-0">5</h3>
+                  </div>
+                  <i class="ph ph-hourglass fs-1 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="card-subtitle mb-1">Urgent</h6>
+                    <h3 class="mb-0">3</h3>
+                  </div>
+                  <i class="ph ph-warning fs-1 opacity-50"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Barre d'actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <button class="btn btn-primary me-2">
+              <i class="ph ph-plus"></i> Nouvelle maintenance
+            </button>
+            <button class="btn btn-outline-secondary me-2">
+              <i class="ph ph-export"></i> Exporter
+            </button>
+          </div>
+          <div class="d-flex">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <i class="ph ph-magnifying-glass"></i>
+              </span>
+              <input type="text" class="form-control" placeholder="Rechercher...">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Onglets -->
+        <div class="card mb-4">
+          <div class="card-body p-2">
+            <ul class="nav nav-tabs nav-fill" id="maintenanceTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="enregistrement-tab" data-bs-toggle="tab" data-bs-target="#enregistrement" type="button" role="tab" aria-controls="enregistrement" aria-selected="true">
+                  <i class="ph ph-plus-circle me-2"></i> Enregistrement
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historique-tab" data-bs-toggle="tab" data-bs-target="#historique" type="button" role="tab" aria-controls="historique" aria-selected="false">
+                  <i class="ph ph-list-checks me-2"></i> Historique
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="planification-tab" data-bs-toggle="tab" data-bs-target="#planification" type="button" role="tab" aria-controls="planification" aria-selected="false">
+                  <i class="ph ph-calendar-check me-2"></i> Planification
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rapports-tab" data-bs-toggle="tab" data-bs-target="#rapports" type="button" role="tab" aria-controls="rapports" aria-selected="false">
+                  <i class="ph ph-chart-line me-2"></i> Rapports
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content" id="maintenanceTabsContent">
+          <!-- Onglet Enregistrement -->
+          <div class="tab-pane fade show active" id="enregistrement" role="tabpanel">
+            <h2>Enregistrement de maintenance</h2>
+            <!-- Formulaire de maintenance -->
+            <form id="maintenanceForm" class="mb-5 fade-in" data-edit-id="">
+              <div class="form-section">
+                <h5><i class="ph ph-identification-card"></i> Identification</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-calendar form-icon"></i>
+                      <input type="date" class="form-control" id="dateMaintenance" required>
+                      <label for="dateMaintenance">Date de maintenance</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-bus form-icon"></i>
+                      <select class="form-select" id="busMaintenance" required>
+                        <option value="">-- Choisir un bus --</option>
+                      </select>
+                      <label for="busMaintenance">Bus concerné</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h5><i class="ph ph-wrench"></i> Détails de la maintenance</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-folder form-icon"></i>
+                      <select class="form-select" id="categorieMaintenance" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="Moteur">Moteur</option>
+                        <option value="Transmission">Transmission</option>
+                        <option value="Freinage">Système de freinage</option>
+                        <option value="Pneumatique">Pneumatique</option>
+                        <option value="Electricite">Électricité</option>
+                        <option value="Carrosserie">Carrosserie</option>
+                        <option value="Autre">Autre</option>
+                      </select>
+                      <label for="categorieMaintenance">Catégorie</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-list-checks form-icon"></i>
+                      <select class="form-select" id="sousMotifMaintenance" required>
+                        <option value="">-- Sélectionnez --</option>
+                      </select>
+                      <label for="sousMotifMaintenance">Motif Spécifique</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="commentaireMotif" class="mb-3 d-none">
+                  <div class="form-floating">
+                    <i class="ph ph-note form-icon"></i>
+                    <textarea class="form-control" id="commentaire" rows="2" style="height:auto; padding-left: 2.5rem;"></textarea>
+                    <label for="commentaire">Commentaire (si autre)</label>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-map-pin form-icon"></i>
+                      <input type="text" class="form-control" id="lieuMaintenance">
+                      <label for="lieuMaintenance">Lieu de maintenance</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-user form-icon"></i>
+                      <input type="text" class="form-control" id="technicien">
+                      <label for="technicien">Nom du technicien</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-phone form-icon"></i>
+                      <input type="tel" class="form-control" id="telephoneTechnicien" placeholder="6XX XXX XXX">
+                      <label for="telephoneTechnicien">Téléphone technicien</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-currency-circle-dollar form-icon"></i>
+                      <input type="number" class="form-control" id="montantMaintenance" required>
+                      <label for="montantMaintenance">Montant (XAF)</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h5><i class="ph ph-clipboard-text"></i> Statut et priorité</h5>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-flag form-icon"></i>
+                      <select class="form-select" id="prioriteMaintenance" required>
+                        <option value="">-- Choisir la priorité --</option>
+                        <option value="Urgent">Urgent</option>
+                        <option value="Haute">Haute</option>
+                        <option value="Moyenne">Moyenne</option>
+                        <option value="Basse">Basse</option>
+                      </select>
+                      <label for="prioriteMaintenance">Priorité</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                      <i class="ph ph-info form-icon"></i>
+                      <select class="form-select" id="statutMaintenance" required>
+                        <option value="">-- Choisir le statut --</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminée">Terminée</option>
+                        <option value="Planifiée">Planifiée</option>
+                      </select>
+                      <label for="statutMaintenance">Statut</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-3">
+                <i class="ph ph-check-circle me-2"></i> Enregistrer la maintenance
+              </button>
+            </form>
+          </div>
+
+          <!-- Onglet Historique -->
+          <div class="tab-pane fade" id="historique" role="tabpanel">
+            <h2>Historique des maintenances</h2>
+            <!-- Filtres -->
+            <div class="card mb-4 fade-in">
+              <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="ph ph-magnifying-glass"></i></span>
+                      <input type="text" id="searchMaintenance" class="form-control" placeholder="Rechercher...">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <select id="filterBus" class="form-select">
+                      <option value="">Tous les bus</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <select id="filterStatut" class="form-select">
+                      <option value="">Tous les statuts</option>
+                      <option value="Terminée">Terminée</option>
+                      <option value="En cours">En cours</option>
+                      <option value="Planifiée">Planifiée</option>
+                    </select>
+                  </div>
+                  <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="ph ph-funnel-simple me-1"></i> Appliquer les filtres
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary ms-2">
+                      <i class="ph ph-arrow-counter-clockwise me-1"></i> Réinitialiser
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Tableau des maintenances -->
+            <div class="card fade-in">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="ph ph-list-checks me-2"></i>
+                  <span>Historique des maintenances</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="btn-group me-3" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-view-toggle="list">
+                      <i class="ph ph-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-view-toggle="grid">
+                      <i class="ph ph-squares-four"></i>
+                    </button>
+                  </div>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="ph ph-export me-1"></i> Exporter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="#" data-action="export" data-format="pdf"><i class="ph ph-file-pdf me-2"></i>PDF</a></li>
+                      <li><a class="dropdown-item" href="#" data-action="export" data-format="excel"><i class="ph ph-file-xls me-2"></i>Excel</a></li>
+                      <li><a class="dropdown-item" href="#" data-action="export" data-format="csv"><i class="ph ph-file-csv me-2"></i>CSV</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Véhicule</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Coût</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="maintenanceList">
+                      <!-- Les maintenances seront chargées dynamiquement ici -->
+                      <tr>
+                        <td colspan="8" class="text-center py-5">
+                          <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                  <div class="text-muted small" id="paginationInfo">
+                    Aucune donnée disponible
+                  </div>
+                  <ul class="pagination pagination-sm mb-0" id="pagination">
+                    <!-- La pagination sera générée dynamiquement -->
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Onglet Planification -->
+          <div class="tab-pane fade" id="planification" role="tabpanel">
+            <h2>Planification des maintenances</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-clock me-2"></i> Planification Préventive</h5>
+                    <p class="card-text">Configurez les maintenances préventives basées sur le kilométrage ou la périodicité.</p>
+                    
+                    <form id="preventiveForm" class="mt-4">
+                      <div class="mb-3">
+                        <label for="preventiveBus" class="form-label">Bus</label>
+                        <select class="form-select" id="preventiveBus" required>
+                          <option value="">-- Sélectionner un bus --</option>
+                        </select>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label for="preventiveType" class="form-label">Type de maintenance</label>
+                        <select class="form-select" id="preventiveType" required>
+                          <option value="">-- Sélectionner --</option>
+                          <option value="Vidange">Vidange</option>
+                          <option value="Révision">Révision générale</option>
+                          <option value="Freinage">Contrôle freinage</option>
+                          <option value="Pneumatique">Rotation pneus</option>
+                          <option value="Autre">Autre</option>
+                        </select>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label class="form-label">Déclencheur</label>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="triggerType" id="triggerKm" value="km" checked>
+                          <label class="form-check-label" for="triggerKm">
+                            Kilométrage (tous les X km)
+                          </label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="triggerType" id="triggerTime" value="time">
+                          <label class="form-check-label" for="triggerTime">
+                            Périodicité (tous les X jours)
+                          </label>
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3" id="kmTriggerGroup">
+                        <label for="kmInterval" class="form-label">Intervalle (km)</label>
+                        <input type="number" class="form-control" id="kmInterval" value="5000" min="1000" step="500">
+                      </div>
+                      
+                      <div class="mb-3 d-none" id="timeTriggerGroup">
+                        <label for="dayInterval" class="form-label">Intervalle (jours)</label>
+                        <input type="number" class="form-control" id="dayInterval" value="30" min="7" step="1">
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label for="lastDone" class="form-label">Dernière réalisation</label>
+                        <input type="date" class="form-control" id="lastDone">
+                      </div>
+                      
+                      <button type="submit" class="btn btn-primary w-100">
+                        <i class="ph ph-calendar-plus me-2"></i> Planifier
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-bell-ringing me-2"></i> Maintenances à venir</h5>
+                    <p class="card-text">Liste des maintenances préventives programmées.</p>
+                    
+                    <div id="upcomingMaintenanceList" class="mt-3">
+                      <!-- Les maintenances planifiées seront ajoutées ici -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mt-4">
+              <div class="card-body">
+                <h5 class="card-title"><i class="ph ph-truck me-2"></i> Suivi Kilométrique</h5>
+                <p class="card-text">Suivez le kilométrage de vos bus pour anticiper les maintenances.</p>
+                
+                <div class="table-responsive mt-3">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Bus</th>
+                        <th>Kilométrage actuel</th>
+                        <th>Dernière vidange</th>
+                        <th>Prochaine vidange</th>
+                        <th>Progression</th>
+                      </tr>
+                    </thead>
+                    <tbody id="mileageTracker">
+                      <!-- Données kilométriques seront ajoutées ici -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Onglet Rapports -->
+          <div class="tab-pane fade" id="rapports" role="tabpanel">
+            <h2>Rapports de maintenance</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-chart-pie me-2"></i> Répartition par catégorie</h5>
+                    <div class="chart-container">
+                      <canvas id="categoryChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-chart-bar me-2"></i> Coûts mensuels</h5>
+                    <div class="chart-container">
+                      <canvas id="monthlyCostChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-bus me-2"></i> Coûts par bus</h5>
+                    <div class="chart-container">
+                      <canvas id="busCostChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="ph ph-flag me-2"></i> Répartition par priorité</h5>
+                    <div class="chart-container">
+                      <canvas id="priorityChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mt-4">
+              <div class="card-body">
+                <h5 class="card-title"><i class="ph ph-file-text me-2"></i> Générer un rapport</h5>
+                <form id="reportForm" class="row g-3">
+                  <div class="col-md-4">
+                    <label for="reportType" class="form-label">Type de rapport</label>
+                    <select class="form-select" id="reportType">
+                      <option value="monthly">Mensuel</option>
+                      <option value="quarterly">Trimestriel</option>
+                      <option value="yearly">Annuel</option>
+                      <option value="custom">Période personnalisée</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-4">
+                    <label for="reportMonth" class="form-label">Mois</label>
+                    <select class="form-select" id="reportMonth">
+                      <option value="01">Janvier</option>
+                      <option value="02">Février</option>
+                      <option value="03">Mars</option>
+                      <option value="04">Avril</option>
+                      <option value="05">Mai</option>
+                      <option value="06">Juin</option>
+                      <option value="07">Juillet</option>
+                      <option value="08">Août</option>
+                      <option value="09">Septembre</option>
+                      <option value="10">Octobre</option>
+                      <option value="11">Novembre</option>
+                      <option value="12">Décembre</option>
+                    </select>
+                  </div>
+                  
+              <div class="col-md-4">
+                    <label for="reportYear" class="form-label">Année</label>
+                    <select class="form-select" id="reportYear">
+                      <option value="2023">2023</option>
+                      <option value="2024">2024</option>
+                      <option value="2025" selected>2025</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-12 d-none" id="customDateGroup">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label for="reportStartDate" class="form-label">Date de début</label>
+                        <input type="date" class="form-control" id="reportStartDate">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="reportEndDate" class="form-label">Date de fin</label>
+                        <input type="date" class="form-control" id="reportEndDate">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="ph ph-file-pdf me-2"></i> Générer PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary ms-2">
+                      <i class="ph ph-file-csv me-2"></i> Exporter CSV
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Pied de page -->
+  <footer class="text-center py-3 bg-dark text-white">
+    <div class="container">
+      <span>ML TRANSPORT &copy; <span id="currentYear"></span> - Tous droits réservés</span>
+    </div>
+  </footer>
+
+  <!-- Scripts JS -->
+  <!-- Scripts JS -->
+  <script src="/js/modules/maintenance/maintenance.js" type="module"></script>
+  <script src="/js/modules/maintenance/notifications.js"></script>
+  <script src="/js/modules/maintenance/maintenance-init.js" type="module"></script>
+  <script src="/js/modules/maintenance/maintenance-charts.js" type="module"></script>
+  <script src="/js/modules/maintenance/maintenance-tracking.js" type="module"></script>
+  <script src="/js/modules/notifications.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+  
+  <!-- Configuration des chemins -->
+  <script src="src/config/paths.js"></script>
+  
+  <!-- Script de débogage -->
+  <script>
+    console.log('Script de débogage - Avant le chargement des scripts de maintenance');
+  </script>
+  
+  <!-- Script de l'application de maintenance -->
+  <script src="public/js/modules/maintenance-bundle.js" 
+          onload="console.log('maintenance-bundle.js chargé avec succès')" 
+          onerror="console.error('Erreur de chargement de maintenance-bundle.js')">
+  </script>
+  
+  <!-- Initialisation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialiser flatpickr pour les sélecteurs de date
+      if (window.flatpickr) {
+        flatpickr("[data-toggle='datepicker']", {
+          locale: 'fr',
+          dateFormat: 'd/m/Y',
+          allowInput: true,
+          disableMobile: true
+        });
+      }
+      
+      // Activer les tooltips Bootstrap
+      if (window.bootstrap) {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+      
+      // Mettre à jour l'année du copyright
+      const currentYearElement = document.getElementById('currentYear');
+      if (currentYearElement) {
+        currentYearElement.textContent = new Date().getFullYear();
+      }
+    });
+  </script>
+  
+  <script src="public/js/modules/include-navbar.js"></script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+/* Cards Component Styles */
+
+/* Base Card Styles */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Header */
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Card Body */
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Card Title */
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+}
+
+/* Card Text */
+.card-text {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Card Footer */
+.card-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1.25rem;
+}
+
+/* Card with Icon */
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+/* Card Stats */
+.card-stats {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.card-stats-item {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1.5rem;
+}
+
+.card-stats-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-stats-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-top: 0.25rem;
+}
+
+/* Card Actions */
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* Card Colors */
+.card-primary .card-icon {
+  background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+}
+
+.card-success .card-icon {
+  background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+}
+
+.card-info .card-icon {
+  background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+}
+
+.card-warning .card-icon {
+  background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+}
+
+.card-danger .card-icon {
+  background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+}
+
+/* Card with Chart */
+.card-chart {
+  position: relative;
+  min-height: 200px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .card-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .card-stats-item {
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+  }
+}

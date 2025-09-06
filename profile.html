@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Utilisateur | ML TRANSPORT</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/icons.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/public/css/main.css">
+  <link rel="stylesheet" href="/public/css/components/sidebar.css">
+  <link rel="stylesheet" href="/public/css/layout.css">
+  <link rel="stylesheet" href="/public/css/pages/profile.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar will be injected here -->
+  </div>
+  
+  <!-- Header -->
+  <header class="app-header">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark d-md-none me-3" id="sidebarToggle">
+          <i class="ph ph-list"></i>
+        </button>
+        <h1 class="h4 mb-0 text-gray-800">Mon Profil</h1>
+      </div>
+      <div class="d-flex align-items-center">
+        <!-- Notification and user dropdown -->
+        <div class="dropdown me-3">
+          <a class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ph ph-bell me-1"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Notifications</h6></li>
+            <li><a class="dropdown-item" href="#">Nouveau message reçu</a></li>
+            <li><a class="dropdown-item" href="#">Maintenance prévue demain</a></li>
+            <li><a class="dropdown-item" href="#">Mise à jour disponible</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-center" href="#">Voir toutes les notifications</a></li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <a class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=4e73df&color=fff" class="rounded-circle me-2" width="32" height="32" alt="Profil">
+            <span class="d-none d-md-inline">Administrateur</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item active" href="profile.html"><i class="ph ph-user me-2"></i>Profil</a></li>
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear me-2"></i>Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#"><i class="ph ph-sign-out me-2"></i>Déconnexion</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content fade-in">
+    <div class="content-container py-4">
+      <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-4 mb-4">
+          <!-- Profile Card -->
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <div class="profile-avatar-container mb-3">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=4e73df&color=fff&size=150" class="rounded-circle border border-4 border-primary" width="150" height="150" alt="Photo de profil">
+                <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle" data-bs-toggle="tooltip" title="Changer la photo">
+                  <i class="ph ph-camera"></i>
+                </button>
+              </div>
+              <h3 class="h5 mb-1">Administrateur</h3>
+              <p class="text-muted mb-3">Administrateur Système</p>
+              
+              <div class="d-flex justify-content-center gap-2 mb-4">
+                <button class="btn btn-outline-primary btn-sm">
+                  <i class="ph ph-pencil-simple-line me-1"></i> Modifier
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                  <i class="ph ph-envelope me-1"></i> Message
+                </button>
+              </div>
+              
+              <hr class="my-4">
+              
+              <div class="text-start">
+                <h6 class="text-uppercase text-muted small mb-3">Informations de contact</h6>
+                <ul class="list-unstyled">
+                  <li class="mb-2">
+                    <i class="ph ph-envelope me-2 text-muted"></i>
+                    <a href="mailto:admin@mltransport.com" class="text-decoration-none">admin@mltransport.com</a>
+                  </li>
+                  <li class="mb-2">
+                    <i class="ph ph-phone me-2 text-muted"></i>
+                    <a href="tel:+33123456789" class="text-decoration-none">+33 1 23 45 67 89</a>
+                  </li>
+                  <li class="mb-2">
+                    <i class="ph ph-buildings me-2 text-muted"></i>
+                    <span>Siège social, Paris</span>
+                  </li>
+                  <li class="mb-2">
+                    <i class="ph ph-calendar me-2 text-muted"></i>
+                    <span>Membre depuis: Janvier 2023</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-lg-8">
+          <!-- Personal Information -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+              <h5 class="mb-0">Informations personnelles</h5>
+            </div>
+            <div class="card-body">
+              <form>
+                <div class="row mb-3">
+                  <div class="col-md-6 mb-3">
+                    <label for="firstName" class="form-label">Prénom</label>
+                    <input type="text" class="form-control" id="firstName" value="Admin" disabled>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="lastName" class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="lastName" value="Système" disabled>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Adresse email</label>
+                  <input type="email" class="form-control" id="email" value="admin@mltransport.com" disabled>
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Téléphone</label>
+                  <input type="tel" class="form-control" id="phone" value="+33 1 23 45 67 89">
+                </div>
+                <div class="mb-3">
+                  <label for="address" class="form-label">Adresse</label>
+                  <textarea class="form-control" id="address" rows="2">123 Rue de Paris, 75001 Paris, France</textarea>
+                </div>
+                <div class="text-end">
+                  <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Change Password -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+              <h5 class="mb-0">Changer le mot de passe</h5>
+            </div>
+            <div class="card-body">
+              <form>
+                <div class="mb-3">
+                  <label for="currentPassword" class="form-label">Mot de passe actuel</label>
+                  <input type="password" class="form-control" id="currentPassword">
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+                    <input type="password" class="form-control" id="newPassword">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="confirmPassword" class="form-label">Confirmer le nouveau mot de passe</label>
+                    <input type="password" class="form-control" id="confirmPassword">
+                  </div>
+                </div>
+                <div class="alert alert-info">
+                  <i class="ph ph-info me-2"></i> Le mot de passe doit contenir au moins 8 caractères, dont des majuscules, des minuscules, des chiffres et des caractères spéciaux.
+                </div>
+                <div class="text-end">
+                  <button type="button" class="btn btn-primary">Mettre à jour le mot de passe</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Preferences -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+              <h5 class="mb-0">Préférences</h5>
+            </div>
+            <div class="card-body">
+              <form>
+                <div class="mb-3">
+                  <label class="form-label">Langue</label>
+                  <select class="form-select">
+                    <option selected>Français</option>
+                    <option>English</option>
+                    <option>Español</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Fuseau horaire</label>
+                  <select class="form-select">
+                    <option value="Europe/Paris" selected>Paris (GMT+2)</option>
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">New York (GMT-4)</option>
+                  </select>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="darkMode" checked>
+                  <label class="form-check-label" for="darkMode">Mode sombre</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                  <label class="form-check-label" for="emailNotifications">Notifications par email</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
+                  <label class="form-check-label" for="pushNotifications">Notifications push</label>
+                </div>
+                <div class="text-end">
+                  <button type="button" class="btn btn-primary">Enregistrer les préférences</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container-fluid py-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div class="mb-2 mb-md-0">
+          <span class="text-muted">© 2023 ML Transport. Tous droits réservés.</span>
+        </div>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-muted text-decoration-none">Confidentialité</a>
+          <a href="#" class="text-muted text-decoration-none">Conditions</a>
+          <a href="#" class="text-muted text-decoration-none">Aide</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Custom JS -->
+  <script src="/public/js/main.js"></script>
+  <script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+  </script>
+</body>
+</html>

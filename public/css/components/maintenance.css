@@ -1,0 +1,396 @@
+/* Styles spécifiques à la page de maintenance */
+
+/* Indicateur de chargement */
+#loadingIndicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loadingIndicator.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#loadingIndicator::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  border: 3px solid rgba(13, 110, 253, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* En-tête de page */
+.maintenance-header {
+  background: linear-gradient(135deg, var(--primary-color), #0b5ed7);
+  color: white;
+  padding: 1.25rem 0;
+  margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.maintenance-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* Sections de formulaire */
+.form-section {
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--box-shadow);
+}
+
+.form-section h5 {
+  color: var(--primary-color);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Tableau des maintenances */
+.maintenance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.maintenance-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.maintenance-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+/* Badges de statut */
+.status-badge {
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+/* Animation de chargement */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .maintenance-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Cartes de statistiques */
+.stats-card {
+  border-left: 4px solid var(--primary-color);
+  transition: transform 0.2s;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Onglets */
+.nav-pills {
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-pills .nav-link {
+  font-weight: 500;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  padding: 0.75rem 1.25rem;
+  margin: 0 0.25rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  background-color: white;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+  opacity: 1;
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  opacity: 1;
+}
+
+/* Contenu des onglets - masqué par défaut */
+.tab-content > .tab-pane {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Contenu de l'onglet actif */
+.tab-content > .tab-pane.active {
+  display: block;
+  opacity: 1;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+/* Style pour les icônes dans les onglets */
+.nav-pills .ph {
+  margin-right: 0.5rem;
+  font-size: 1.1em;
+}
+
+/* Style pour les en-têtes d'onglets */
+.tab-pane > h2 {
+  color: var(--primary-color);
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Formulaire de recherche */
+.search-box {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-box .form-control {
+  padding-left: 2.5rem;
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Boutons d'action */
+.action-buttons .btn {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive des tableaux */
+.table-responsive {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+/* Pied de tableau */
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Pagination personnalisée */
+.pagination-custom .page-link {
+  color: var(--primary-color);
+  border: 1px solid #dee2e6;
+  margin: 0 0.2rem;
+  border-radius: 0.25rem;
+  min-width: 2.25rem;
+  text-align: center;
+}
+
+.pagination-custom .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Graphiques */
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-bottom: 1.5rem;
+}
+
+/* Cartes de véhicules */
+.vehicle-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Alertes personnalisées */
+.alert-maintenance {
+  border-left: 4px solid transparent;
+}
+
+.alert-maintenance.alert-warning {
+  border-left-color: var(--warning-color);
+}
+
+.alert-maintenance.alert-danger {
+  border-left-color: var(--danger-color);
+}
+
+.alert-maintenance.alert-info {
+  border-left-color: var(--info-color);
+}
+
+/* Bouton d'enregistrement principal */
+#maintenanceForm button[type="submit"] {
+  background: linear-gradient(135deg, var(--primary-color), #0b5ed7);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(13, 110, 253, 0.25);
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+#maintenanceForm button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+  background: linear-gradient(135deg, #0b5ed7, var(--primary-color));
+}
+
+#maintenanceForm button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+#maintenanceForm button[type="submit"] i {
+  font-size: 1.2em;
+  margin-right: 8px;
+}
+
+/* Style pour le bouton de chargement */
+button.is-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+button.is-loading:after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: button-loading 0.8s linear infinite;
+}
+
+@keyframes button-loading {
+  to { transform: rotate(360deg); }
+}
+
+/* Barre d'outils */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Champs de formulaire groupés */
+.input-group-text {
+  background-color: #f8f9fa;
+}
+
+/* Sélecteurs de date personnalisés */
+.date-picker-container {
+  position: relative;
+}
+
+.date-picker-container .form-control {
+  padding-left: 2.5rem;
+}
+
+.date-picker-container .date-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+}

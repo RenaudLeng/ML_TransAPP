@@ -1,0 +1,87 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "html"
+  ],
+  "eslint.format.enable": true,
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "files.associations": {
+    "*.html": "html",
+    "*.js": "javascript"
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "html": "html"
+  },
+  "html.format.wrapLineLength": 100,
+  "html.format.wrapAttributes": "force-expand-multiline",
+  "html.format.unformatted": "wbr",
+  "html.format.contentUnformatted": "pre,code,textarea",
+  "html.format.extraLiners": "head, body, /html",
+  "html.format.indentInnerHtml": true,
+  "html.format.preserveNewLines": true,
+  "html.format.indentHandlebars": true,
+  "html.format.endWithNewline": true,
+  "html.format.maxPreserveNewLines": 2,
+  "html.format.templating": true,
+  "html.format.wrapAttributesIndentSize": 2,
+  "html.suggest.angular1": false,
+  "html.suggest.ionic": false,
+  "html.suggest.html5": true,
+  "html.autoClosingTags": true,
+  "html.autoCreateQuotes": true,
+  "html.format.enable": true,
+  "emmet.syntaxProfiles": {
+    "javascript": "jsx",
+    "html": {
+      "attr_quotes": "single"
+    }
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.git": true
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "liveServer.settings.donotVerifyTags": true,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.ignoreFiles": [
+    "**/.vscode/**",
+    "**/node_modules/**",
+    "**/public/**"
+  ],
+  "liveServer.settings.encoding": "utf-8",
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": true
+}

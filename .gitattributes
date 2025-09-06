@@ -1,0 +1,31 @@
+# Définir le comportement par défaut pour tous les fichiers
+* text=auto eol=crlf
+
+# Fichiers binaires qui ne doivent pas être modifiés
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.a binary
+*.o binary
+*.class binary
+
+# Fichiers texte avec des fins de ligne spécifiques
+*.js eol=crlf
+*.json eol=crlf
+*.html eol=crlf
+*.css eol=crlf
+*.md eol=crlf
+*.txt eol=crlf
+*.sh eol=lf
+*.bat eol=crlf
+*.cmd eol=crlf

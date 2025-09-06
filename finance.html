@@ -1,0 +1,3919 @@
+<!DOCTYPE html>
+<!-- DEBUG: Chargement de finance.html -->
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Finance | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Scripts JS -->
+  <!-- 1. Core Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  
+  <!-- 2. Application Scripts -->
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/pages/finance.css" rel="stylesheet">
+  <script src="/js/modules/notifications/notifications.js"></script>
+  <script src="/js/theme.js"></script>
+  <!-- include-navbar.js sera chargé de manière asynchrone -->
+  
+  <!-- 3. Finance Module -->
+  <script type="module">
+    // Importer le module d'initialisation
+    import { initializeApp } from '/js/modules/finance/finance-init.js';
+    
+    // Initialiser l'application quand le DOM est prêt
+    const initFinanceApp = async () => {
+      try {
+        await initializeApp();
+        console.log('Module Finance initialisé avec succès');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation du module Finance:', error);
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFinanceApp);
+    } else {
+      initFinanceApp();
+    }
+    
+    // Exporter l'application pour un accès global si nécessaire
+    window.financeApp = {
+      initializeApp
+    };
+  </script>
+
+<!-- Phosphor Icons -->
+<script type="module" src="https://unpkg.com/phosphor-icons"></script>
+
+<!-- FileSaver for Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- CSS -->
+<link href="./css/navbar.css" rel="stylesheet">
+<link href="./css/buttons.css?v=1.1" rel="stylesheet">
+<link href="./css/notifications.css" rel="stylesheet">
+
+<!-- Style amélioré -->
+<style>
+:root {
+  --card-border-radius: 12px;
+  --card-padding: 1.25rem;
+  --transition-speed: 0.3s;
+}
+
+/* Cartes de synthèse améliorées */
+.summary-card {
+  border-radius: var(--card-border-radius);
+  padding: var(--card-padding);
+  transition: all var(--transition-speed) ease;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+.summary-card-today {
+  background: linear-gradient(135deg, #198754 0%, #2ecc71 100%);
+  color: white;
+}
+
+.summary-card-today::before {
+  background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.summary-card-week {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.summary-card-week::before {
+  background: linear-gradient(90deg, #2980b9 0%, #3498db 100%);
+}
+
+.summary-card-month {
+  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+  color: #2c3e50;
+}
+
+.summary-card-month::before {
+  background: linear-gradient(90deg, #f39c12 0%, #f1c40f 100%);
+}
+
+.summary-card-total {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+}
+
+.summary-card-total::before {
+  background: linear-gradient(90deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.summary-card-expenses {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.summary-card-expenses::before {
+  background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
+}
+
+.summary-card-profit {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+}
+
+.summary-card-profit::before {
+  background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card .card-title {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card .card-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card small {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Cartes de recettes */
+.receipt-card {
+  transition: all var(--transition-speed) ease;
+  border-left: 4px solid;
+  border-radius: var(--card-border-radius);
+  position: relative;
+}
+
+/* Style pour les recettes normales */
+.receipt-normal {
+  border-left-color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.05);
+}
+
+/* Style pour les recettes en dessous de l'objectif */
+.receipt-low {
+  border-left-color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.05);
+}
+
+/* Style pour les recettes au-dessus de l'objectif */
+.receipt-high {
+  border-left-color: #3498db;
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Style pour les recettes exceptionnelles */
+.receipt-exception {
+  border-left-color: #9b59b6;
+  background-color: rgba(155, 89, 182, 0.05);
+}
+
+/* Style pour les recettes complémentaires */
+.receipt-complement {
+  border-left-color: #f39c12;
+  background-color: rgba(243, 156, 18, 0.05);
+  position: relative;
+  padding-right: 30px;
+}
+
+.receipt-complement::after {
+  content: '⟳';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.2em;
+  color: #f39c12;
+  opacity: 0.3;
+}
+
+.receipt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.receipt-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.comment-icon {
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.comment-icon:hover {
+  transform: scale(1.1);
+  color: #0d6efd;
+}
+
+.comment-bubble {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 3px solid #0d6efd;
+}
+
+.target-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+}
+
+.target-met {
+  background-color: #198754;
+  color: white;
+}
+
+.target-not-met {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Boutons d'action */
+.action-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  transition: all var(--transition-speed);
+  border: 1px solid transparent;
+  background-color: transparent;
+}
+
+/* Style pour le bouton de complément */
+.complement-btn {
+  color: #f39c12;
+  border-color: #f39c12;
+  background-color: rgba(243, 156, 18, 0.1);
+}
+
+.complement-btn:hover {
+  background-color: #f39c12;
+  color: white;
+  transform: rotate(180deg);
+}
+
+/* Style pour le badge de complément */
+.badge-complement {
+  background-color: #f39c12;
+  color: white;
+  font-weight: normal;
+  padding: 0.25em 0.5em;
+  border-radius: 0.25rem;
+  font-size: 0.75em;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.edit-btn {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+  border: none;
+}
+
+.edit-btn:hover {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+
+.delete-btn {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: none;
+}
+
+.delete-btn:hover {
+  background-color: rgba(220, 53, 69, 0.2);
+}
+
+/* Styles pour les dépenses */
+.expense-item {
+  border-left: 4px solid #e74c3c;
+  transition: all var(--transition-speed) ease;
+}
+
+.expense-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.expense-details {
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+/* Styles pour les justificatifs */
+.justificatif-container {
+  margin-top: 10px;
+}
+
+.justificatif-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.justificatif-image:hover {
+  transform: scale(1.05);
+}
+
+/* Onglets */
+.nav-tabs .nav-link {
+  border: none;
+  color: #495057;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  border-bottom: 3px solid #0d6efd;
+  background-color: transparent;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  border-bottom: 3px solid #dee2e6;
+}
+
+/* Autres styles */
+.bus-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bus-select-option .status-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+  transition: all var(--transition-speed) ease;
+}
+
+.input-group:focus-within .input-group-text {
+  background-color: #e7f1ff;
+  color: #0d6efd;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-card, .expense-item {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+}
+
+/* Animation pour les nouvelles entrées */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.new-entry {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Styles pour le calendrier */
+.calendar {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.calendar th, .calendar td {
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #dee2e6;
+  height: 40px;
+  vertical-align: middle;
+  position: relative;
+}
+
+.calendar th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.calendar .day-cell {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar .day-cell:hover {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.calendar .today {
+  background-color: #e7f5ff;
+  font-weight: bold;
+  position: relative;
+}
+
+.calendar .today::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background-color: #0d6efd;
+  border-radius: 50%;
+}
+
+/* Style pour les jours avec objectif atteint */
+.calendar .complete {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+/* Style pour les jours avec objectif partiellement atteint */
+.calendar .partial {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Style pour les jours exceptionnels */
+.calendar .exception {
+  background-color: #e2d4f0;
+  color: #4a2b7a;
+  position: relative;
+}
+
+/* Style pour les jours avec complément */
+.calendar .has-complement::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background-color: #f39c12;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Style pour les cellules vides */
+.calendar .empty {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: default;
+}
+
+/* Style pour le survol des cellules */
+.calendar .day-cell:hover {
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Style pour les cellules sélectionnées */
+.calendar .selected {
+  box-shadow: inset 0 0 0 2px #0d6efd;
+  font-weight: bold;
+}
+
+/* Style pour les cellules futures */
+.calendar .future {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.badge-future {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+}
+
+.badge-complete {
+  background-color: #198754;
+  color: white;
+}
+
+.badge-partial {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-none {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid #d6d8db;
+}
+
+.badge-exception {
+  background-color: #f3e5ff;
+  color: #5f3dc4;
+  border: 1px solid #e9d8fd;
+}
+
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.month-title {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.month-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* Modal pour les images */
+.modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+}
+</style>
+
+  <link href="/css/pages/style.css" rel="stylesheet"></head>
+<body class="light-mode">
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <!-- La barre de navigation est chargée dynamiquement par include-navbar.js -->
+
+<!-- CONTENU PRINCIPAL -->
+<main class="container mt-5 pt-5">
+
+  <!-- ZONE DES TOTAUX - NOUVEAU DESIGN -->
+  <div class="row text-center mb-4 g-3" id="zoneTotaux">
+    <div class="col-md-3">
+      <div class="summary-card summary-card-today">
+        <div class="card-body p-2">
+          <h5 class="card-title"><i class="ph ph-sun me-1"></i> Recettes Aujourd'hui</h5>
+          <p class="card-text" id="totalJour">0 XAF</p>
+          <small id="dailyTargetStatus"></small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card summary-card-expenses">
+        <div class="card-body p-2">
+          <h5 class="card-title"><i class="ph ph-arrow-down-left me-1"></i> Dépenses Aujourd'hui</h5>
+          <p class="card-text" id="depensesJour">0 XAF</p>
+          <small>Total des dépenses</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card summary-card-profit">
+        <div class="card-body p-2">
+          <h5 class="card-title"><i class="ph ph-trend-up me-1"></i> Bénéfice Aujourd'hui</h5>
+          <p class="card-text" id="profitJour">0 XAF</p>
+          <small>Recettes - Dépenses</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card summary-card-total">
+        <div class="card-body p-2">
+          <h5 class="card-title"><i class="ph ph-coin me-1"></i> Bénéfice Total</h5>
+          <p class="card-text" id="totalProfit">0 XAF</p>
+          <small>Toutes opérations</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boutons de navigation -->
+  <div class="d-flex justify-content-center mb-4">
+    <div class="btn-group" role="group" aria-label="Navigation principale">
+      <button type="button" class="btn btn-outline-primary active" id="btnRecettes" data-bs-toggle="modal" data-bs-target="#recettesModal" onclick="updateActiveTab('recettes')">
+        <i class="ph ph-wallet me-1"></i> Recettes
+      </button>
+      <button type="button" class="btn btn-outline-primary" id="btnDepenses" data-bs-toggle="modal" data-bs-target="#depensesModal" onclick="updateActiveTab('depenses')">
+        <i class="ph ph-arrow-down-left me-1"></i> Dépenses
+      </button>
+      <button type="button" class="btn btn-outline-primary" id="btnCoches" data-bs-toggle="modal" data-bs-target="#cochesModal" onclick="updateActiveTab('coches')">
+        <i class="ph ph-calendar-check me-1"></i> Coches
+      </button>
+    </div>
+  </div>
+</main>
+
+  <!-- Conteneur principal -->
+  <div id="contentContainer" class="container-fluid py-4">
+    <!-- Les sections sont maintenant dans les modales -->
+    <div class="text-center py-5">
+      <h2 class="text-muted">Sélectionnez une option dans le menu ci-dessus</h2>
+      <p class="lead text-muted">Utilisez les boutons en haut de la page pour accéder aux différentes fonctionnalités.</p>
+    </div>
+  </div>
+
+<!-- Modal pour les Recettes -->
+<div class="modal fade" id="recettesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="ph ph-wallet"></i> Gestion des Recettes</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">
+            <i class="ph ph-wallet fs-2"></i> Enregistrement des Recettes
+          </h2>
+          <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="ph ph-export"></i> Exporter
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToPDF('recettes');"><i class="ph ph-file-pdf"></i> Exporter en PDF</a></li>
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToExcel('recettes');"><i class="ph ph-file-xls"></i> Exporter en Excel</a></li>
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToCSV('recettes');"><i class="ph ph-file-csv"></i> Exporter en CSV</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <form id="recetteForm" class="card p-4 shadow-sm mb-4">
+          <div class="mb-3" id="montantInitialContainer" style="display: none;">
+            <label for="montantInitial" class="form-label">Montant initial</label>
+            <input type="number" class="form-control" id="montantInitial" readonly>
+          </div>
+          <div class="mb-3" id="montantRestantContainer" style="display: none;">
+            <div class="alert alert-info">
+              <i class="ph ph-info"></i> <span id="montantRestant"></span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="dateRecette" class="form-label">Date</label>
+              <input type="date" class="form-control" id="dateRecette" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="matriculeBus" class="form-label">Matricule du bus</label>
+              <select class="form-select" id="matriculeBus" required></select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="montantRecette" class="form-label">Montant versé (XAF)</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="montantRecette" required>
+                <span class="input-group-text">XAF</span>
+              </div>
+              <div class="form-text text-muted">Objectif journalier: 35 000 XAF</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="commentaireRecette" class="form-label">Commentaire (facultatif)</label>
+            <textarea class="form-control" id="commentaireRecette" rows="2" placeholder="Ex: Paiement partiel, client XYZ..."></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Jour exceptionnel (facultatif)</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="jourExceptionnel" id="jourNormal" value="" checked>
+              <label class="form-check-label" for="jourNormal">
+                Jour normal
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="jourExceptionnel" id="jourFerie" value="ferie">
+              <label class="form-check-label" for="jourFerie">
+                Jour férié
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="jourExceptionnel" id="jourConge" value="conge">
+              <label class="form-check-label" for="jourConge">
+                Jour de congé
+              </label>
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-secondary me-md-2" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="ph ph-plus-circle me-1"></i> Enregistrer la recette
+            </button>
+          </div>
+        </form>
+        
+        <div class="card shadow-sm">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="ph ph-list-bullets"></i> Historique des recettes</h5>
+            <div class="d-flex gap-2">
+              <div class="input-group input-group-sm" style="width: 250px;">
+                <span class="input-group-text"><i class="ph ph-magnifying-glass"></i></span>
+                <input type="text" id="searchRecette" class="form-control" placeholder="Rechercher...">
+              </div>
+              <select id="filterBus" class="form-select form-select-sm" style="width: 200px;">
+                <option value="">Tous les bus</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th>Bus</th>
+                    <th class="text-end">Montant</th>
+                    <th>Type</th>
+                    <th>Commentaire</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recettesList">
+                  <!-- Les recettes seront chargées ici dynamiquement -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les Dépenses -->
+<div class="modal fade" id="depensesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="ph ph-arrow-down-left"></i> Gestion des Dépenses</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">
+            <i class="ph ph-arrow-down-left fs-2"></i> Enregistrement des Dépenses
+          </h2>
+          <div class="dropdown">
+            <button class="btn btn-danger dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="ph ph-export"></i> Exporter
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToPDF('depenses');"><i class="ph ph-file-pdf"></i> Exporter en PDF</a></li>
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToExcel('depenses');"><i class="ph ph-file-xls"></i> Exporter en Excel</a></li>
+              <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToCSV('depenses');"><i class="ph ph-file-csv"></i> Exporter en CSV</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <form id="depenseForm" class="card p-4 shadow-sm mb-4">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label for="dateDepense" class="form-label">Date</label>
+              <input type="date" class="form-control" id="dateDepense" required>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="typeDepense" class="form-label">Type de dépense</label>
+              <select class="form-select" id="typeDepense" required>
+                <option value="">Sélectionner un type</option>
+                <option value="carburant">Carburant</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="reparation">Réparation</option>
+                <option value="nettoyage">Nettoyage</option>
+                <option value="divers">Divers</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="busDepense" class="form-label">Bus concerné</label>
+              <select class="form-select" id="busDepense">
+                <option value="">Tous les bus</option>
+                <!-- Les options seront ajoutées dynamiquement -->
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="montantDepense" class="form-label">Montant (XAF)</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="montantDepense" required>
+                <span class="input-group-text">XAF</span>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="descriptionDepense" class="form-label">Description</label>
+            <textarea class="form-control" id="descriptionDepense" rows="2" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="pieceJointe" class="form-label">Pièce jointe (facultatif)</label>
+            <input class="form-control" type="file" id="pieceJointe">
+          </div>
+          
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-secondary me-md-2" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-danger">
+              <i class="ph ph-plus-circle me-1"></i> Enregistrer la dépense
+            </button>
+          </div>
+        </form>
+        
+        <div class="card shadow-sm">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="ph ph-list-bullets"></i> Historique des dépenses</h5>
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtrerDepenses('')">Tout</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtrerDepenses('carburant')">Carburant</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtrerDepenses('maintenance')">Maintenance</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtrerDepenses('reparation')">Réparations</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filtrerDepenses('divers')">Divers</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Bus</th>
+                    <th class="text-end">Montant</th>
+                    <th>Description</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="depensesList">
+                  <!-- Les dépenses seront chargées ici dynamiquement -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour l'Historique des Activités -->
+<div class="modal fade" id="historiqueModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="ph ph-clock-counter-clockwise"></i> Historique des Activités</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">
+            <i class="ph ph-clock-counter-clockwise fs-2"></i> Journal des Activités
+          </h2>
+          <div class="d-flex gap-2">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ph ph-funnel"></i> Filtrer
+              </button>
+              <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 250px;">
+                <div class="mb-3">
+                  <label for="filterType" class="form-label">Type d'action</label>
+                  <select class="form-select" id="filterType">
+                    <option value="all">Toutes les actions</option>
+                    <option value="create">Créations</option>
+                    <option value="update">Modifications</option>
+                    <option value="delete">Suppressions</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="filterEntity" class="form-label">Type d'entité</label>
+                  <select class="form-select" id="filterEntity">
+                    <option value="all">Tous les types</option>
+                    <option value="recette">Recettes</option>
+                    <option value="depense">Dépenses</option>
+                    <option value="coche">Coches</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="filterDate" class="form-label">Période</label>
+                  <select class="form-select" id="filterDate">
+                    <option value="today">Aujourd'hui</option>
+                    <option value="week">Cette semaine</option>
+                    <option value="month" selected>Ce mois</option>
+                    <option value="all">Toutes les dates</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary w-100" onclick="applyHistoryFilters()">
+                  <i class="ph ph-check"></i> Appliquer
+                </button>
+              </div>
+            </div>
+            <button class="btn btn-outline-secondary" onclick="refreshHistory()">
+              <i class="ph ph-arrow-clockwise"></i> Actualiser
+            </button>
+          </div>
+        </div>
+        
+        <div id="historyContent">
+          <!-- Le contenu de l'historique sera chargé ici dynamiquement -->
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement de l'historique...</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="text-muted small">
+          <i class="ph ph-info"></i> Les activités sont enregistrées localement dans votre navigateur.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les Coches -->
+<div class="modal fade" id="cochesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xxl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="ph ph-calendar-check"></i> Calendrier des Coches</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="mb-0">
+            <i class="ph ph-calendar-check fs-2"></i> Suivi des Coches
+          </h2>
+          <div class="d-flex gap-2">
+            <div class="input-group" style="width: 200px;">
+              <select class="form-select" id="busCalendarSelect">
+                <option value="all">Tous les bus</option>
+                <!-- Les options seront ajoutées dynamiquement -->
+              </select>
+            </div>
+            <div class="input-group" style="width: 200px;">
+              <button class="btn btn-outline-secondary" type="button" onclick="navigateMonth(-1)">
+                <i class="ph ph-caret-left"></i>
+              </button>
+              <input type="month" class="form-control text-center" id="monthSelect">
+              <button class="btn btn-outline-secondary" type="button" onclick="navigateMonth(1)">
+                <i class="ph ph-caret-right"></i>
+              </button>
+            </div>
+            <button class="btn btn-success" onclick="generateCalendar()">
+              <i class="ph ph-arrows-clockwise"></i> Actualiser
+            </button>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <div id="calendarContainer">
+              <!-- Le calendrier sera généré ici dynamiquement -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <div class="d-flex gap-2 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="legend-color bg-success"></div>
+              <span class="ms-2">Complet</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <div class="legend-color bg-warning"></div>
+              <span class="ms-2">Partiel</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <div class="legend-color bg-danger"></div>
+              <span class="ms-2">Manquant</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <div class="legend-color bg-secondary"></div>
+              <span class="ms-2">Non applicable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles pour la légende du calendrier -->
+<style>
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-block;
+}
+</style>
+
+<!-- MODAL D'ÉDITION RECETTE -->
+<div class="modal fade" id="editRecetteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Modifier la recette</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editRecetteForm">
+          <input type="hidden" id="editRecetteId">
+          <div class="mb-3">
+            <label for="editRecetteDate" class="form-label">Date</label>
+            <input type="date" class="form-control" id="editRecetteDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="editRecetteMatricule" class="form-label">Matricule du bus</label>
+            <select class="form-select" id="editRecetteMatricule" required></select>
+          </div>
+          <div class="mb-3">
+            <label for="editRecetteMontant" class="form-label">Montant (XAF)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="editRecetteMontant" required>
+              <span class="input-group-text">XAF</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="editRecetteCommentaire" class="form-label">Commentaire</label>
+            <textarea class="form-control" id="editRecetteCommentaire" rows="2"></textarea>
+          </div>
+          
+          <!-- Section pour les jours exceptionnels -->
+          <div class="mb-3">
+            <label class="form-label">Type de jour</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editJourExceptionnel" id="editJourNormal" value="" checked>
+              <label class="form-check-label" for="editJourNormal">
+                Jour normal
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editJourExceptionnel" id="editJourFerie" value="ferie">
+              <label class="form-check-label" for="editJourFerie">
+                Jour férié
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editJourExceptionnel" id="editJourConge" value="conge">
+              <label class="form-check-label" for="editJourConge">
+                Jour de congé
+              </label>
+            </div>
+          </div>
+          <!-- Champs cachés pour la gestion des compléments -->
+          <input type="hidden" id="recetteId" value="">
+          <input type="hidden" id="estComplement" value="false">
+          <input type="hidden" id="recettePrincipaleId" value="">
+          <input type="hidden" id="montantInitialHidden" value="0">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-standard" data-bs-dismiss="modal">
+          <i class="ph ph-x"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-primary btn-standard" id="saveRecetteEdit">
+          <i class="ph ph-floppy-disk"></i> Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL D'ÉDITION DEPENSE -->
+<div class="modal fade" id="editDepenseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Modifier la dépense</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editDepenseForm">
+          <input type="hidden" id="editDepenseId">
+          <div class="mb-3">
+            <label for="editDepenseDate" class="form-label">Date</label>
+            <input type="date" class="form-control" id="editDepenseDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="editDepenseType" class="form-label">Type de dépense</label>
+            <select class="form-select" id="editDepenseType" required>
+              <option value="bus">Liée à un bus</option>
+              <option value="entreprise">Liée à l'entreprise</option>
+            </select>
+          </div>
+          <div class="mb-3" id="editBusFieldDepense">
+            <label for="editBusDepense" class="form-label">Bus concerné</label>
+            <select class="form-select" id="editBusDepense">
+              <option value="">-- Choisir un bus --</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editDepenseMotif" class="form-label">Motif</label>
+            <input type="text" class="form-control" id="editDepenseMotif" required>
+          </div>
+          <div class="mb-3">
+            <label for="editDepenseMontant" class="form-label">Montant (XAF)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="editDepenseMontant" required>
+              <span class="input-group-text">XAF</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="editDepenseDetails" class="form-label">Détails</label>
+            <textarea class="form-control" id="editDepenseDetails" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editDepenseJustificatif" class="form-label">Justificatif</label>
+            <input type="file" class="form-control" id="editDepenseJustificatif" accept="image/*">
+            <div class="form-text">Modifier le justificatif si nécessaire</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-standard" data-bs-dismiss="modal">
+          <i class="ph ph-x"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-primary btn-standard" id="saveDepenseEdit">
+          <i class="ph ph-floppy-disk"></i> Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL POUR AFFICHER L'IMAGE -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Justificatif</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="modal-image" alt="Justificatif" onerror="this.style.display='none'">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-standard" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="text-center py-3 bg-dark text-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <span>Powered by Forever/&gt;Inc</span>
+      <span class="small">Dernière mise à jour: <span id="lastUpdate"></span></span>
+    </div>
+  </div>
+</footer>
+
+<!-- Conteneur de notifications -->
+<div id="notification-container"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="./js/notifications.js"></script>
+<script src="./js/app.js"></script>
+<script>
+// Constantes
+const DAILY_TARGET = 35000;
+const HOLIDAY_TARGET = 30000;
+const DEADLINE_HOUR = 22; // 22h pour la deadline
+const DEADLINE_MINUTE = 55; // 55 minutes
+
+// Initialisation principale de l'application
+// Initialisation principale de l'application
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    console.log('Initialisation de l\'application...');
+    
+    // Vérifier si l'application est déjà initialisée
+    if (window.appInitialized) {
+      console.log('L\'application est déjà initialisée');
+      return;
+    }
+    
+    // Initialiser les composants de base
+    await initializeAppComponents();
+    
+    // Initialiser les écouteurs d'événements
+    initEventListeners();
+    
+    // Marquer l'application comme initialisée
+    window.appInitialized = true;
+    console.log('Application initialisée avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation de l\'application:', error);
+    showNotification('Une erreur est survenue lors du chargement de l\'application', 'error');
+  }
+});
+
+// Fonction pour ouvrir une modale spécifique
+function openModal(modalType) {
+  console.log(`Tentative d'ouverture de la modale: ${modalType}`);
+  
+  // Vérifier que le type de modale est valide
+  const validModalTypes = ['recettes', 'depenses', 'coches'];
+  if (!validModalTypes.includes(modalType)) {
+    console.error(`Type de modale invalide: ${modalType}`);
+    return;
+  }
+  
+  // Récupérer l'élément de la modale
+  const modalId = `${modalType}Modal`;
+  const modalElement = document.getElementById(modalId);
+  
+  if (!modalElement) {
+    console.error(`Élément de modale non trouvé: ${modalId}`);
+    return;
+  }
+  
+  try {
+    // Récupérer ou créer l'instance de la modale Bootstrap
+    let modal = bootstrap.Modal.getInstance(modalElement);
+    if (!modal) {
+      console.log(`Création d'une nouvelle instance de la modale: ${modalId}`);
+      modal = new bootstrap.Modal(modalElement);
+    }
+    
+    // Charger le contenu spécifique si nécessaire
+    const contentDiv = document.getElementById(`${modalType}Content`);
+    if (contentDiv) {
+      // Sauvegarder le contenu original s'il n'existe pas encore
+      if (!contentDiv.dataset.originalContent) {
+        contentDiv.dataset.originalContent = contentDiv.innerHTML;
+      }
+      
+      // Charger le contenu spécifique en fonction du type de modale
+      console.log(`Chargement du contenu pour: ${modalType}`);
+      switch(modalType) {
+        case 'recettes':
+          loadRecettesContent(contentDiv);
+          break;
+        case 'depenses':
+          loadDepensesContent(contentDiv);
+          break;
+        case 'coches':
+          loadCochesContent(contentDiv);
+          break;
+      }
+    }
+    
+    // Mettre à jour l'onglet actif avant d'afficher la modale
+    updateActiveTab(modalType);
+    
+    // Afficher la modale
+    console.log(`Affichage de la modale: ${modalId}`);
+    modal.show();
+    
+    // Forcer le focus sur la modale pour les utilisateurs au clavier
+    modalElement.focus();
+    
+  } catch (error) {
+    console.error(`Erreur lors de l'ouverture de la modale ${modalType}:`, error);
+  }
+}
+
+// Fonction pour mettre à jour l'onglet actif
+function updateActiveTab(activeTab) {
+  console.log('Mise à jour de l\'onglet actif:', activeTab);
+  
+  // Mettre à jour les boutons de navigation
+  const navButtons = document.querySelectorAll('.btn-group .btn');
+  navButtons.forEach(button => {
+    // Supprimer la classe active de tous les boutons
+    button.classList.remove('active');
+    
+    // Ajouter la classe active uniquement au bouton correspondant à l'onglet actif
+    if (button.id === `btn${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`) {
+      button.classList.add('active');
+    }
+  });
+  
+  // Mettre à jour les sections de contenu
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(section => {
+    if (section.id === activeTab) {
+      section.style.display = 'block';
+      
+      // Charger le contenu spécifique si nécessaire
+      try {
+        switch(activeTab) {
+          case 'recettes':
+            console.log('Chargement du contenu des recettes...');
+            afficherRecettes();
+            break;
+          case 'depenses':
+            console.log('Chargement du contenu des dépenses...');
+            afficherDepenses();
+            break;
+          case 'coches':
+            console.log('Génération du calendrier des coches...');
+            generateCalendar();
+            break;
+        }
+      } catch (error) {
+        console.error(`Erreur lors du chargement de la section ${activeTab}:`, error);
+      }
+    } else {
+      section.style.display = 'none';
+    }
+  });
+  
+  console.log(`Section ${activeTab} mise à jour avec succès`);
+}
+
+// Fonction pour charger le contenu des recettes
+function loadRecettesContent(container) {
+  // Sauvegarder le contenu original
+  if (!container.dataset.originalContent) {
+    container.dataset.originalContent = `
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="ph ph-wallet fs-2"></i> Enregistrement des Recettes
+        </h2>
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="ph ph-export"></i> Exporter
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToPDF('recettes');">PDF</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToExcel('recettes');">Excel</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToCSV('recettes');">CSV</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Formulaire d'ajout de recette -->
+      <form id="recetteForm" class="mb-4">
+        <input type="hidden" id="recetteId" value="">
+        <input type="hidden" id="estComplement" value="false">
+        <input type="hidden" id="recettePrincipaleId" value="">
+        
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="dateRecette" class="form-label">Date</label>
+            <input type="date" class="form-control" id="dateRecette" required>
+          </div>
+          
+          <div class="col-md-3">
+            <label for="matriculeBus" class="form-label">Bus</label>
+            <select class="form-select" id="matriculeBus" required>
+              <option value="">Sélectionner un bus</option>
+              ${getAvailableBuses()
+                .filter(bus => bus.service === 'Oui')
+                .map(bus => `<option value="${bus.matricule}">${bus.matricule} - ${bus.nom}</option>`)
+                .join('')}
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label for="montantRecette" class="form-label">Montant (XAF)</label>
+            <input type="number" class="form-control" id="montantRecette" min="0" step="100" required>
+          </div>
+          
+          <div class="col-md-4">
+            <label for="commentaireRecette" class="form-label">Commentaire</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="commentaireRecette" placeholder="Détails de la recette">
+              <button type="submit" class="btn btn-primary">
+                <i class="ph ph-plus-circle"></i> Ajouter
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="montantRestantContainer" class="mt-2 d-none">
+          <small class="text-muted">Montant restant: <span id="montantRestant">0</span> XAF</small>
+        </div>
+        
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" id="jourExceptionnel">
+          <label class="form-check-label" for="jourExceptionnel">
+            Jour exceptionnel
+          </label>
+        </div>
+        
+        <div id="typeExceptionContainer" class="mt-2 d-none">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="typeException" id="typeFerie" value="ferie">
+            <label class="form-check-label" for="typeFerie">Jours fériés</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="typeException" id="typeConge" value="conge">
+            <label class="form-check-label" for="typeConge">Congés</label>
+          </div>
+        </div>
+      </form>
+      
+      <div id="btnAjouterComplement" class="d-none mb-3">
+        <button class="btn btn-sm btn-outline-primary" onclick="ajouterComplement()">
+          <i class="ph ph-plus-circle"></i> Ajouter un complément
+        </button>
+      </div>
+
+      <!-- Liste des recettes -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="ph ph-list-bullets"></i> Historique des recettes</h4>
+        <div class="input-group" style="width: 300px;">
+          <span class="input-group-text"><i class="ph ph-magnifying-glass"></i></span>
+          <input type="text" class="form-control" id="searchRecette" placeholder="Rechercher..." oninput="afficherRecettes(this.value)">
+        </div>
+      </div>
+      <div id="recettesListContainer" class="table-responsive"></div>
+    `;
+  }
+
+  
+  container.innerHTML = container.dataset.originalContent;
+  
+  // Initialiser les écouteurs d'événements pour le formulaire
+  const form = document.getElementById('recetteForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const recetteId = document.getElementById('recetteId').value;
+      if (recetteId) {
+        saveEditedRecette();
+      } else {
+        ajouterRecette();
+      }
+    });
+    
+    // Gestion des jours exceptionnels
+    const jourExceptionnel = document.getElementById('jourExceptionnel');
+    if (jourExceptionnel) {
+      jourExceptionnel.addEventListener('change', function() {
+        document.getElementById('typeExceptionContainer').classList.toggle('d-none', !this.checked);
+      });
+    }
+  }
+  
+  // Afficher la liste des recettes
+  afficherRecettes();
+}
+
+// Fonction pour charger le contenu des dépenses
+function loadDepensesContent(container) {
+  if (!container.dataset.originalContent) {
+    container.dataset.originalContent = `
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="ph ph-arrow-down-left fs-2"></i> Enregistrement des Dépenses
+        </h2>
+        <div class="dropdown">
+          <button class="btn btn-danger dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="ph ph-export"></i> Exporter
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToPDF('depenses');">PDF</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToExcel('depenses');">Excel</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportToCSV('depenses');">CSV</a></li>
+          </ul>
+        </div>
+      </div>
+      <div id="depensesFormContainer"></div>
+      <div id="depensesListContainer" class="mt-4"></div>
+    `;
+  }
+  
+  container.innerHTML = container.dataset.originalContent;
+  
+  // Initialiser le formulaire et la liste des dépenses
+  afficherDepenses();
+}
+
+// Fonction pour charger le contenu du calendrier des coches
+function loadCochesContent(container) {
+  if (!container.dataset.originalContent) {
+    container.dataset.originalContent = `
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="ph ph-calendar-check fs-2"></i> Calendrier des Coches
+        </h2>
+        <div class="d-flex gap-2">
+          <select id="monthSelect" class="form-select" style="width: auto;">
+            ${Array.from({length: 12}, (_, i) => {
+              const date = new Date();
+              date.setMonth(i);
+              return `<option value="${i + 1}">${date.toLocaleString('fr-FR', {month: 'long'})}</option>`;
+            }).join('')}
+          </select>
+          <select id="yearSelect" class="form-select" style="width: auto;">
+            ${Array.from({length: 5}, (_, i) => {
+              const year = new Date().getFullYear() - 2 + i;
+              return `<option value="${year}" ${i === 2 ? 'selected' : ''}>${year}</option>`;
+            }).join('')}
+          </select>
+          <button class="btn btn-success" onclick="generateCalendar()">
+            <i class="ph ph-arrow-clockwise"></i> Actualiser
+          </button>
+        </div>
+      </div>
+      <div id="calendarContainer"></div>
+    `;
+  }
+  
+  container.innerHTML = container.dataset.originalContent;
+  
+  // Initialiser le calendrier
+  generateCalendar();
+}
+
+// Fonction pour basculer entre les sections (alias pour openModal pour compatibilité)
+function switchTab(sectionName) {
+  console.log('switchTab appelé pour:', sectionName);
+  openModal(sectionName);
+}
+
+// Fonction pour initialiser les modales
+function initializeModals() {
+  console.log('Initialisation des modales...');
+  
+  // Initialisation des modales Bootstrap
+  const modalElements = document.querySelectorAll('.modal');
+  
+  modalElements.forEach(modalEl => {
+    try {
+      // Créer une instance de la modale Bootstrap
+      const modal = new bootstrap.Modal(modalEl);
+      
+      // Stocker une référence à l'instance de la modale sur l'élément
+      modalEl._modalInstance = modal;
+      
+      // Gestion de la fermeture du modal
+      modalEl.addEventListener('hidden.bs.modal', function (event) {
+        console.log(`Modal fermée: ${modalEl.id}`);
+        
+        // Réinitialisation du formulaire si nécessaire
+        const form = modalEl.querySelector('form');
+        if (form) {
+          form.reset();
+          // Réinitialiser les états des champs si nécessaire
+          const hiddenFields = form.querySelectorAll('input[type="hidden"]');
+          hiddenFields.forEach(field => field.value = '');
+        }
+        
+        // Nettoyer les champs spécifiques si nécessaire
+        if (modalEl.id === 'recettesModal') {
+          console.log('Nettoyage des champs de la modale Recettes');
+          // Exemple: document.getElementById('montantRecette').value = '';
+        }
+      });
+      
+      // Gestion de l'affichage du modal
+      modalEl.addEventListener('show.bs.modal', function (event) {
+        console.log(`Affichage de la modale: ${modalEl.id}`);
+        
+        // Charger le contenu spécifique si nécessaire
+        switch(modalEl.id) {
+          case 'recettesModal':
+            console.log('Préparation de la modale Recettes');
+            // Initialiser les sélecteurs, etc.
+            break;
+          case 'depensesModal':
+            console.log('Préparation de la modale Dépenses');
+            // Initialiser les sélecteurs, etc.
+            break;
+          case 'cochesModal':
+            console.log('Préparation de la modale Coches');
+            // Initialiser le calendrier si nécessaire
+            break;
+        }
+      });
+      
+      console.log(`Modal ${modalEl.id} initialisée avec succès`);
+    } catch (error) {
+      console.error(`Erreur lors de l'initialisation de la modale ${modalEl.id}:`, error);
+    }
+  });
+  
+  console.log(`Initialisation des modales terminée. ${modalElements.length} modales initialisées.`);
+  return modalElements.length > 0;
+}
+
+// Initialisation des données au chargement
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    // Initialiser les modales
+    const modalsInitialized = initializeModals();
+    console.log('Modales initialisées:', modalsInitialized);
+    
+    // Initialiser l'application
+    if (typeof initializeApplication === 'function') {
+      await initializeApplication();
+    } else {
+      console.error('La fonction initializeApplication n\'est pas définie');
+    }
+    
+    // Initialiser les liens de navigation
+    try {
+      const navLinks = document.querySelectorAll('.nav-link[data-bs-toggle="tab"], .nav-link[data-bs-toggle="modal"]');
+      if (navLinks && navLinks.length > 0) {
+        navLinks.forEach(link => {
+          if (link) {
+            link.addEventListener('click', function(e) {
+              try {
+                e.preventDefault();
+                const target = this.getAttribute('data-bs-target');
+                if (target) {
+                  const tabName = target.replace('#', '');
+                  openModal(tabName);
+                }
+              } catch (error) {
+                console.error('Erreur lors du clic sur le lien de navigation:', error);
+              }
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation des liens de navigation:', error);
+    }
+    
+    // Ne plus ouvrir automatiquement l'onglet Recettes au chargement
+    console.log('Chargement terminé sans ouverture automatique de modale');
+    
+    console.log('Application initialisée avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation:', error);
+    showNotification('Erreur lors du chargement des données: ' + error.message, 'danger');
+  }
+});
+
+// Récupérer les bus depuis le localStorage ou une API
+function getAvailableBuses() {
+  try {
+    // Essayer de récupérer depuis le localStorage
+    const busesFromStorage = JSON.parse(localStorage.getItem('busList')) || [];
+
+    if (busesFromStorage.length > 0) {
+      return busesFromStorage.map(bus => ({
+        matricule: bus.matricule,
+        nom: bus.nom,
+        service: bus.service
+      }));
+    }
+
+    // Si aucun bus dans le localStorage, utiliser des valeurs par défaut
+    return [
+      { matricule: 'AK678AA', nom: 'Bus Principal', service: 'Oui' },
+      { matricule: 'AK679BB', nom: 'Bus Secondaire', service: 'Oui' },
+      { matricule: 'AK680CC', nom: 'Bus de Réserve', service: 'Non' }
+    ];
+  } catch (e) {
+    console.error("Erreur lors de la récupération des bus:", e);
+    return [];
+  }
+}
+
+/**
+ * Appelle une fonction de manière sécurisée et gère les erreurs
+ * @param {Function} fn - La fonction à appeler
+ * @param {string} fnName - Le nom de la fonction pour les logs
+ * @returns {Promise<void>}
+ */
+async function safeCall(fn, fnName) {
+  try {
+    if (typeof fn === 'function') {
+      await Promise.resolve(fn());
+    } else {
+      console.warn(`${fnName} n'est pas une fonction`);
+    }
+  } catch (error) {
+    console.error(`Erreur dans ${fnName}:`, error);
+  }
+}
+
+/**
+ * Définit la valeur d'un élément s'il existe
+ * @param {string} id - L'ID de l'élément
+ * @param {string} value - La valeur à définir
+ */
+function safeSetValue(id, value) {
+  try {
+    const element = document.getElementById(id);
+    if (element) {
+      element.value = value;
+    } else {
+      console.warn(`Élément non trouvé: #${id}`);
+    }
+  } catch (error) {
+    console.error(`Erreur lors de la définition de la valeur pour #${id}:`, error);
+  }
+}
+
+/**
+ * Charge les données initiales de l'application
+ * @returns {Promise<void>}
+ */
+async function loadInitialData() {
+  try {
+    console.log('Chargement des données initiales...');
+    
+    // Charger les données depuis le localStorage ou une API
+    const savedData = localStorage.getItem('financeData');
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      Object.assign(appState.data, parsedData);
+      console.log('Données chargées depuis le stockage local');
+    }
+    
+    // Mettre à jour l'interface utilisateur
+    if (typeof afficherRecettes === 'function') {
+      await safeCall(afficherRecettes, 'afficherRecettes');
+    }
+    
+    if (typeof afficherDepenses === 'function') {
+      await safeCall(afficherDepenses, 'afficherDepenses');
+    }
+    
+    if (typeof mettreAJourTotaux === 'function') {
+      await safeCall(mettreAJourTotaux, 'mettreAJourTotaux');
+    }
+    
+    console.log('Données initiales chargées avec succès');
+  } catch (error) {
+    console.error('Erreur lors du chargement des données initiales:', error);
+    throw error;
+  }
+}
+
+/**
+ * Initialise les composants de base de l'application
+ * @returns {Promise<void>}
+ */
+async function initializeAppComponents() {
+  // Vérifier si l'initialisation a déjà été effectuée
+  if (window.appInitialized) {
+    console.log('Les composants de l\'application sont déjà initialisés');
+    return;
+  }
+  
+  console.log('Initialisation des composants de l\'application...');
+  
+  try {
+    // Marquer l'initialisation comme en cours
+    window.appInitializing = true;
+    
+    // 1. Initialiser les sélecteurs de bus de manière séquentielle
+    await Promise.all([
+      safeCall(populateBusSelect, 'populateBusSelect'),
+      safeCall(populateBusFilter, 'populateBusFilter'),
+      safeCall(populateDepenseBusSelect, 'populateDepenseBusSelect'),
+      safeCall(populateEditBusSelect, 'populateEditBusSelect'),
+      safeCall(populateEditDepenseBusSelect, 'populateEditDepenseBusSelect'),
+      safeCall(populateCalendarBusSelect, 'populateCalendarBusSelect')
+    ]);
+    
+    // 2. Définir la date du jour par défaut
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+    
+    // Mettre à jour les champs de date s'ils existent
+    safeSetValue('dateRecette', todayFormatted);
+    safeSetValue('dateDepense', todayFormatted);
+    
+    // 3. Définir le mois actuel par défaut dans le sélecteur de mois
+    const currentMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+    safeSetValue('monthSelect', currentMonth);
+    
+    // 4. Initialiser les sélecteurs de date
+    if (typeof initDatePickers === 'function') {
+      await safeCall(initDatePickers, 'initDatePickers');
+    }
+    
+    // 5. Initialiser les écouteurs d'événements
+    if (typeof initAppEventListeners === 'function') {
+      await safeCall(initAppEventListeners, 'initAppEventListeners');
+    }
+    
+    // 6. Ne plus afficher automatiquement la section par défaut
+    console.log('Initialisation terminée sans afficher de modale par défaut');
+    
+    // 7. Mettre à jour les totaux et la date de dernière modification
+    if (typeof mettreAJourTotaux === 'function') {
+      await safeCall(mettreAJourTotaux, 'mettreAJourTotaux');
+    }
+    
+    if (typeof updateLastModified === 'function') {
+      await safeCall(updateLastModified, 'updateLastModified');
+    }
+    
+    // 8. Marquer l'initialisation comme terminée
+    window.appInitialized = true;
+    console.log('Composants de l\'application initialisés avec succès');
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation des composants:', error);
+    throw error; // Propager l'erreur pour qu'elle soit gérée par l'appelant
+  } finally {
+    window.appInitializing = false;
+  }
+}
+
+function populateBusSelect() {
+  const selectBus = document.getElementById('matriculeBus');
+  selectBus.innerHTML = '';
+
+  const availableBuses = getAvailableBuses()
+    .filter(bus => bus.service === 'Oui') // Seulement les bus en service
+    .sort((a, b) => a.matricule.localeCompare(b.matricule));
+
+  if (availableBuses.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Aucun bus disponible';
+    option.disabled = true;
+    selectBus.appendChild(option);
+    return;
+  }
+
+  availableBuses.forEach(bus => {
+    const option = document.createElement('option');
+    option.value = bus.matricule;
+    option.textContent = `${bus.matricule} - ${bus.nom}`;
+    selectBus.appendChild(option);
+  });
+}
+
+function populateCalendarBusSelect() {
+  const selectBus = document.getElementById('busCalendarSelect');
+  // Garder l'option "Tous les bus"
+  while (selectBus.options.length > 1) {
+    selectBus.remove(1);
+  }
+
+  const availableBuses = getAvailableBuses()
+    .filter(bus => bus.service === 'Oui') // Seulement les bus en service
+    .sort((a, b) => a.matricule.localeCompare(b.matricule));
+
+  availableBuses.forEach(bus => {
+    const option = document.createElement('option');
+    option.value = bus.matricule;
+    option.textContent = `${bus.matricule} - ${bus.nom}`;
+    selectBus.appendChild(option);
+  });
+}
+
+function populateDepenseBusSelect() {
+  const selectBus = document.getElementById('busDepense');
+  selectBus.innerHTML = '<option value="">-- Choisir un bus --</option>';
+
+  const availableBuses = getAvailableBuses()
+    .sort((a, b) => a.matricule.localeCompare(b.matricule));
+
+  availableBuses.forEach(bus => {
+    const option = document.createElement('option');
+    option.value = bus.matricule;
+    option.textContent = `${bus.matricule} - ${bus.nom}`;
+    selectBus.appendChild(option);
+  });
+}
+
+function populateEditDepenseBusSelect() {
+  const selectBus = document.getElementById('editBusDepense');
+  selectBus.innerHTML = '<option value="">-- Choisir un bus --</option>';
+
+  const availableBuses = getAvailableBuses()
+    .sort((a, b) => a.matricule.localeCompare(b.matricule));
+
+  availableBuses.forEach(bus => {
+    const option = document.createElement('option');
+    option.value = bus.matricule;
+    option.textContent = `${bus.matricule} - ${bus.nom}`;
+    selectBus.appendChild(option);
+  });
+}
+
+/**
+ * Remplit le sélecteur de filtre des bus avec les bus disponibles
+ * @returns {void}
+ */
+function populateBusFilter() {
+  try {
+    const filterBus = document.getElementById('filterBus');
+    
+    // Vérifier si l'élément existe
+    if (!filterBus) {
+      console.warn("L'élément filterBus n'a pas été trouvé dans le DOM");
+      return;
+    }
+    
+    // Réinitialiser le contenu du sélecteur
+    filterBus.innerHTML = '<option value="">Tous les bus</option>';
+
+    // Récupérer les bus disponibles
+    let availableBuses = [];
+    try {
+      availableBuses = getAvailableBuses() || [];
+      
+      // Trier les bus par matricule
+      availableBuses.sort((a, b) => (a.matricule || '').localeCompare(b.matricule || ''));
+      
+      // Ajouter chaque bus au sélecteur
+      availableBuses.forEach(bus => {
+        if (bus && bus.matricule) {
+          const option = document.createElement('option');
+          option.value = bus.matricule;
+          option.textContent = `${bus.matricule}${bus.nom ? ' - ' + bus.nom : ''}`;
+          filterBus.appendChild(option);
+        }
+      });
+      
+      console.log(`Filtre des bus mis à jour avec ${availableBuses.length} bus`);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des bus:', error);
+    }
+  } catch (error) {
+    console.error('Erreur dans populateBusFilter:', error);
+  }
+}
+
+function populateEditBusSelect() {
+  const selectBus = document.getElementById('editRecetteMatricule');
+  selectBus.innerHTML = '';
+
+  const availableBuses = getAvailableBuses()
+    .sort((a, b) => a.matricule.localeCompare(b.matricule));
+
+  availableBuses.forEach(bus => {
+    const option = document.createElement('option');
+    option.value = bus.matricule;
+    option.textContent = `${bus.matricule} - ${bus.nom}`;
+    selectBus.appendChild(option);
+  });
+}
+
+function afficherBoutonComplement(recette) {
+  if (peutAvoirComplement(recette)) {
+    return `
+      <button type="button" class="btn btn-sm btn-outline-secondary ms-2" 
+              onclick="configurerComplement(${JSON.stringify(recette).replace(/"/g, '&quot;')})"
+              title="Ajouter un complément">
+        <i class="ph ph-arrow-clockwise"></i>
+      </button>`;
+  }
+  return '';
+}
+
+function afficherRecettes(filter = '') {
+  // Récupérer le conteneur principal des recettes dans la modale
+  const recetteList = document.getElementById('recettesListContainer');
+  
+  if (!recetteList) {
+    // Vérifier si on est en mode développement (hors production)
+    const isDev = !window.location.hostname.endsWith('.com') && !window.location.hostname.endsWith('.fr');
+    if (isDev) {
+      console.warn('Élément recettesListContainer introuvable - La modale des recettes n\'est peut-être pas encore ouverte');
+    }
+    return;
+  }
+
+  // Afficher l'indicateur de chargement
+  recetteList.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>`;
+    
+  // Charger les données de manière asynchrone
+  setTimeout(() => {
+    try {
+      const busFilter = document.getElementById('filterBus') ? document.getElementById('filterBus').value : '';
+      const searchTerm = filter ? filter.toLowerCase() : '';
+      const recettes = window.appState?.data?.recettes || [];
+
+      if (recettes.length === 0) {
+        recetteList.innerHTML = `
+          <div class="alert alert-info">
+            <i class="ph ph-info"></i> Aucune recette enregistrée
+          </div>`;
+        return;
+      }
+
+      // Filtrer les recettes en fonction des critères
+      let filteredRecettes = recettes.filter(recette => {
+        // Filtrer par recherche
+        const matchesSearch = searchTerm === '' || 
+          (recette.commentaire && recette.commentaire.toLowerCase().includes(searchTerm)) ||
+          (recette.matricule && recette.matricule.toLowerCase().includes(searchTerm)) ||
+          recette.montant.toString().includes(searchTerm);
+        
+        // Filtrer par bus
+        const matchesBus = !busFilter || recette.matricule === busFilter;
+        
+        return matchesSearch && matchesBus && !recette.estComplementDe;
+      });
+
+      // Trier par date (plus récent en premier)
+      filteredRecettes.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      if (filteredRecettes.length === 0) {
+        recetteList.innerHTML = `
+          <div class="alert alert-warning">
+            <i class="ph ph-warning"></i> Aucune recette ne correspond aux critères de recherche
+          </div>`;
+        return;
+      }
+
+      // Afficher les recettes
+      let html = `
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Bus</th>
+                <th class="text-end">Montant</th>
+                <th>Commentaire</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+      filteredRecettes.forEach(recette => {
+        try {
+          const date = new Date(recette.date);
+          const dateStr = date.toLocaleDateString('fr-FR', {
+            weekday: 'short',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+
+          // Vérifier si c'est un jour exceptionnel
+          const isExceptionnel = recette.estExceptionnel || false;
+          const typeException = recette.typeException || '';
+          
+          // Vérifier si la recette a des compléments
+          const hasComplements = recette.complements && recette.complements.length > 0;
+          const totalAmount = hasComplements 
+            ? recette.complements.reduce((sum, comp) => sum + (parseFloat(comp.montant) || 0), parseFloat(recette.montant) || 0)
+            : parseFloat(recette.montant) || 0;
+
+          html += `
+            <tr class="${isExceptionnel ? 'table-warning' : ''}">
+              <td>
+                <div>${dateStr}</div>
+                ${isExceptionnel ? `
+                  <small class="text-warning">
+                    <i class="ph ph-warning"></i> ${typeException === 'ferie' ? 'Jour férié' : 'Congé'}
+                  </small>
+                ` : ''}
+              </td>
+              <td>${recette.matricule || '-'}</td>
+              <td class="text-end fw-bold">${totalAmount.toLocaleString()} XAF</td>
+              <td>
+                ${recette.commentaire || '-'}
+                ${hasComplements ? `
+                  <div class="text-muted small">
+                    <i class="ph ph-list-checks"></i> ${recette.complements.length} complément(s)
+                  </div>
+                ` : ''}
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" 
+                          onclick="openEditRecetteModal(${recettes.indexOf(recette)})">
+                    <i class="ph ph-pencil"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" 
+                          onclick="if(confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) supprimerRecette(${recettes.indexOf(recette)})">
+                    <i class="ph ph-trash"></i>
+                  </button>
+                  ${peutAvoirComplement(recette) ? `
+                    <button class="btn btn-outline-secondary" 
+                            onclick="configurerComplement(${JSON.stringify(recette).replace(/"/g, '&quot;')})"
+                            title="Ajouter un complément">
+                      <i class="ph ph-plus-circle"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>`;
+            
+            // Afficher les compléments s'il y en a
+            if (hasComplements) {
+              recette.complements.forEach(complement => {
+                const compIndex = recettes.findIndex(r => r.id === complement.id);
+                if (compIndex !== -1) {
+                  html += `
+                    <tr class="table-light">
+                      <td class="text-muted small" colspan="2">
+                        <i class="ph ph-arrow-return-right"></i> Complément
+                      </td>
+                      <td class="text-end text-muted small">${complement.montant.toLocaleString()} XAF</td>
+                      <td class="text-muted small">${complement.commentaire || ''}</td>
+                      <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button class="btn btn-outline-secondary btn-sm" 
+                                  onclick="openEditRecetteModal(${compIndex})">
+                            <i class="ph ph-pencil"></i>
+                          </button>
+                          <button class="btn btn-outline-secondary btn-sm" 
+                                  onclick="if(confirm('Êtes-vous sûr de vouloir supprimer ce complément ?')) supprimerRecette(${compIndex})">
+                            <i class="ph ph-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>`;
+                }
+              });
+            }
+        } catch (error) {
+          console.error('Erreur lors de l\'affichage de la recette:', recette, error);
+        }
+      });
+
+      // Fermer le tableau
+      html += `
+            </tbody>
+          </table>
+        </div>`;
+      
+      // Mettre à jour le contenu
+      recetteList.innerHTML = html;
+      
+      // Mettre à jour les totaux si la fonction existe
+      if (typeof mettreAJourTotaux === 'function') {
+        mettreAJourTotaux();
+      }
+    } catch (error) {
+      console.error('Erreur dans afficherRecettes:', error);
+      recetteList.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="ph ph-warning"></i> Une erreur est survenue lors du chargement des recettes
+        </div>`;
+    }
+  }, 100); // Petit délai pour permettre l'affichage du spinner
+}
+
+function afficherDepenses() {
+  // Récupérer ou initialiser depenseList (avec un 's' car l'ID dans le HTML est 'depensesList')
+  let depenseList = document.getElementById('depensesList');
+  if (!depenseList) {
+    console.error('Élément #depensesList non trouvé dans le DOM');
+    return;
+  }
+  
+  depenseList.innerHTML = '';
+  const depenses = window.appState?.data?.depenses || [];
+
+  if (depenses.length === 0) {
+    depenseList.innerHTML = `
+      <div class="alert alert-info text-center">
+        <i class="ph ph-info"></i> Aucune dépense enregistrée
+      </div>
+    `;
+    return;
+  }
+
+  // Filtrer selon le filtre actif
+  let filteredDepenses = depenses;
+  if (currentFilter !== 'all') {
+    filteredDepenses = depenses.filter(d => d.type === currentFilter);
+  }
+
+  // Trier par date (récent en premier)
+  filteredDepenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (filteredDepenses.length === 0) {
+    depenseList.innerHTML = `
+      <div class="alert alert-warning text-center">
+        <i class="ph ph-warning"></i> Aucune dépense trouvée pour ce filtre
+      </div>
+    `;
+    return;
+  }
+
+  // Utilisation d'un fragment pour améliorer les performances
+  const fragment = document.createDocumentFragment();
+
+  filteredDepenses.forEach((depense, index) => {
+    const card = document.createElement('div');
+    card.className = 'card mb-3 p-3 expense-item';
+
+    // Récupérer le nom du bus si c'est une dépense liée à un bus
+    const busInfo = depense.bus ? getAvailableBuses().find(b => b.matricule === depense.bus) || {} : {};
+    const busName = busInfo.nom || '';
+
+    // Afficher le justificatif s'il existe
+    let justificatifHTML = '';
+    if (depense.justificatif) {
+      justificatifHTML = `
+        <div class="justificatif-container mt-2">
+          <p class="mb-1"><i class="ph ph-image"></i> Justificatif joint:</p>
+          <img src="${depense.justificatif}" class="justificatif-image" onclick="showImageModal('${depense.justificatif}')" 
+               alt="Justificatif de dépense" title="Cliquez pour agrandir">
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1">
+            <i class="ph ph-arrow-down-left text-danger"></i> ${depense.motif}
+            <small class="text-muted">(${depense.type === 'bus' ? 'Bus: ' + depense.bus + (busName ? ' (' + busName + ')' : '') : 'Entreprise'})</small>
+          </h5>
+          <small class="text-muted">${formatDate(depense.date)}</small>
+          ${depense.details ? `
+            <div class="expense-details mt-2">
+              <i class="ph ph-info"></i> ${depense.details}
+            </div>
+          ` : ''}
+          ${justificatifHTML}
+        </div>
+        <div class="text-end">
+          <h4 class="mb-0 text-danger">${depense.montant.toLocaleString()} XAF</h4>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-2">
+        <button class="action-btn edit-btn no-print" onclick="openEditDepenseModal(${index})" title="Modifier">
+          <i class="ph ph-pencil"></i>
+        </button>
+        <button class="action-btn delete-btn no-print" onclick="supprimerDepense(${index})" title="Supprimer">
+          <i class="ph ph-trash"></i>
+        </button>
+      </div>
+    `;
+
+    fragment.appendChild(card);
+  });
+
+  depenseList.appendChild(fragment);
+  mettreAJourTotaux();
+}
+
+// Variables globales
+let currentFilter = 'all';
+let currentEditIndex = -1; // Pour suivre l'index de l'élément en cours d'édition
+
+// Fonction pour filtrer les dépenses par type
+function filtrerDepenses(type) {
+  currentFilter = type || 'all';
+  afficherDepenses();
+  
+  // Mettre à jour le style des boutons de filtre
+  document.querySelectorAll('#depensesListContainer .btn-group .btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Activer le bouton de filtre sélectionné
+  const activeBtn = [...document.querySelectorAll('#depensesListContainer .btn-group .btn')]
+    .find(btn => btn.textContent.trim().toLowerCase() === type || 
+                (type === 'all' && btn.textContent.trim() === 'Tout'));
+  
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
+}
+
+function openEditRecetteModal(index) {
+  currentEditIndex = index;
+  const recettes = window.appState?.data?.recettes || [];
+  const recette = recettes[index];
+  
+  if (!recette) {
+    console.error('Recette non trouvée à l\'index', index);
+    showNotification('Erreur: Recette non trouvée', 'error');
+    return;
+  }
+  
+  // Mettre à jour les champs du formulaire
+  document.getElementById('editRecetteId').value = index;
+  document.getElementById('editRecetteDate').value = recette.date;
+  document.getElementById('editRecetteMatricule').value = recette.matricule;
+  document.getElementById('editRecetteMontant').value = recette.montant;
+  document.getElementById('editRecetteCommentaire').value = recette.commentaire || '';
+  
+  // Gestion des jours exceptionnels
+  const jourExceptionnelContainer = document.getElementById('editJourExceptionnelContainer');
+  const jourExceptionnelRadios = document.querySelectorAll('input[name="editJourExceptionnel"]');
+  
+  // Réinitialiser les boutons radio
+  jourExceptionnelRadios.forEach(radio => {
+    radio.checked = false;
+  });
+  
+  if (recette.estExceptionnel && recette.typeException) {
+    // Cochez le bouton radio approprié
+    const radioToCheck = document.querySelector(`input[name="editJourExceptionnel"][value="${recette.typeException}"]`);
+    if (radioToCheck) {
+      radioToCheck.checked = true;
+    }
+  } else {
+    // Cochez l'option "Normal"
+    document.querySelector('input[name="editJourExceptionnel"][value=""]').checked = true;
+  }
+  
+  // Afficher/masquer le champ du bus si nécessaire
+  const busField = document.getElementById('editBusField');
+  if (busField) {
+    busField.classList.toggle('d-none', recette.matricule);
+  }
+  
+  // Mettre à jour le texte du bouton de soumission
+  const submitBtn = document.querySelector('#editRecetteModal button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.innerHTML = '<i class="ph ph-floppy-disk"></i> Enregistrer les modifications';
+  }
+  
+  // Afficher la modale
+  if (window.editRecetteModal) {
+    window.editRecetteModal.show();
+  } else {
+    console.error('editRecetteModal is not available');
+  }
+}
+
+function openEditDepenseModal(index) {
+  currentEditIndex = index;
+  const depenses = window.appState?.data?.depenses || [];
+  const depense = depenses[index];
+  
+  if (!depense) {
+    console.error('Dépense non trouvée à l\'index', index);
+    showNotification('Erreur: Dépense non trouvée', 'error');
+    return;
+  }
+
+  document.getElementById('editDepenseId').value = index;
+  document.getElementById('editDepenseDate').value = depense.date;
+  document.getElementById('editDepenseType').value = depense.type;
+  document.getElementById('editDepenseMotif').value = depense.motif;
+  document.getElementById('editDepenseMontant').value = depense.montant;
+  document.getElementById('editDepenseDetails').value = depense.details || '';
+
+  // Gérer le champ bus
+  const editBusField = document.getElementById('editBusFieldDepense');
+  if (depense.type === 'bus') {
+    editBusField.classList.remove('d-none');
+    document.getElementById('editBusDepense').value = depense.bus || '';
+  } else {
+    editBusField.classList.add('d-none');
+  }
+
+  editDepenseModal.show();
+}
+
+function saveEditedRecette() {
+
+  // Mettre à jour la recette existante avec les nouvelles valeurs
+  const updatedRecette = {
+    ...existingRecette, // Conserver les champs existants
+    date,
+    matricule,
+    montant,
+    commentaire,
+    estExceptionnel,
+    typeException,
+    dateModification: new Date().toISOString()
+  };
+
+  // Si c'est une recette complémentaire, mettre à jour le montant total de la recette principale
+  if (existingRecette.recettePrincipaleId) {
+    const recettePrincipale = recettes.find(r => r.id === existingRecette.recettePrincipaleId);
+    if (recettePrincipale) {
+      // Soustraire l'ancien montant du complément et ajouter le nouveau
+      const ancienMontant = existingRecette.montant || 0;
+      const nouveauMontant = montant || 0;
+      const difference = nouveauMontant - ancienMontant;
+      
+      // Mettre à jour le montant total de la recette principale
+      recettePrincipale.montantTotal = (recettePrincipale.montantTotal || recettePrincipale.montant) + difference;
+    }
+  }
+
+  // Mettre à jour la recette dans l'état global
+  const recettes = [...(window.appState?.data?.recettes || [])];
+  recettes[index] = updatedRecette;
+  
+  // Mettre à jour l'état global et sauvegarder
+  window.appState?.updateData('recettes', recettes);
+
+  // Mettre à jour ou ajouter la recette
+  if (isNew) {
+    recettes.push(updatedRecette);
+    showNotification('Recette ajoutée avec succès', 'success');
+    
+    // Enregistrer dans l'historique
+    if (typeof historiqueManager !== 'undefined') {
+      historiqueManager.enregistrerAction(
+        'creation',
+        'recette',
+        updatedRecette,
+        'utilisateur', // Remplacer par l'utilisateur connecté
+        'Nouvelle recette ajoutée'
+      );
+    }
+  } else {
+    // Avant de mettre à jour, sauvegarder l'ancienne version pour l'historique
+    const recettes = [...(window.appState?.data?.recettes || [])];
+    const ancienneRecette = {...recettes[index]};
+    recettes[index] = updatedRecette;
+    showNotification('Recette mise à jour avec succès', 'success');
+    
+    // Enregistrer dans l'historique
+    if (typeof historiqueManager !== 'undefined') {
+      historiqueManager.enregistrerAction(
+        'modification',
+        'recette',
+        {
+          avant: ancienneRecette,
+          apres: updatedRecette,
+          champsModifies: Object.keys(updatedRecette).filter(key => 
+            JSON.stringify(ancienneRecette[key]) !== JSON.stringify(updatedRecette[key]))
+        },
+        'utilisateur', // Remplacer par l'utilisateur connecté
+        'Modification de la recette'
+      );
+    }
+  }
+
+  // Mettre à jour l'interface utilisateur
+  if (window.editRecetteModal) {
+    window.editRecetteModal.hide();
+  }
+  afficherRecettes(searchRecette.value);
+  generateCalendar();
+  updateDashboard();
+}
+
+function saveEditedDepense() {
+  const index = currentEditIndex;
+  const isNew = index === -1;
+  
+  if (!isNew && index >= depenses.length) return;
+
+  const depenses = [...(window.appState?.data?.depenses || [])];
+  // Récupérer la dépense existante pour conserver les champs non modifiés
+  const existingDepense = !isNew ? depenses[index] : null;
+  
+  const editedDepense = {
+    id: isNew ? 'dep-' + Date.now() : existingDepense.id,
+    date: document.getElementById('editDepenseDate').value,
+    type: document.getElementById('editDepenseType').value,
+    bus: document.getElementById('editDepenseType').value === 'bus' ? document.getElementById('editBusDepense').value : null,
+    motif: document.getElementById('editDepenseMotif').value,
+    montant: parseInt(document.getElementById('editDepenseMontant').value, 10),
+    details: document.getElementById('editDepenseDetails').value,
+    justificatif: (depenses[index]?.justificatif) || null // Conserver l'ancien justificatif
+  };
+
+  // Gestion du nouveau justificatif
+  const justificatifInput = document.getElementById('editDepenseJustificatif');
+  if (justificatifInput.files.length > 0) {
+    const file = justificatifInput.files[0];
+    editedDepense.justificatif = URL.createObjectURL(file);
+  }
+
+  if (isNew) {
+    // Ajout d'une nouvelle dépense
+    depenses.push(editedDepense);
+    localStorage.setItem('depenses', JSON.stringify(depenses));
+    
+    // Enregistrer dans l'historique
+    if (typeof historiqueManager !== 'undefined') {
+      historiqueManager.enregistrerAction(
+        'creation',
+        'depense',
+        editedDepense,
+        'utilisateur', // Remplacer par l'utilisateur connecté
+        'Nouvelle dépense ajoutée'
+      );
+    }
+    
+    showNotification('Dépense ajoutée avec succès', 'success');
+  } else {
+    // Mise à jour d'une dépense existante
+    const depenses = [...(window.appState?.data?.depenses || [])];
+    const ancienneDepense = {...depenses[index]};
+    depenses[index] = editedDepense;
+    // Mettre à jour l'état global
+    window.appState?.updateData('depenses', depenses);
+    
+    // Enregistrer dans l'historique
+    if (typeof historiqueManager !== 'undefined') {
+      historiqueManager.enregistrerAction(
+        'modification',
+        'depense',
+        {
+          avant: ancienneDepense,
+          apres: editedDepense,
+          champsModifies: Object.keys(editedDepense).filter(key => 
+            JSON.stringify(ancienneDepense[key]) !== JSON.stringify(editedDepense[key]))
+        },
+        'utilisateur', // Remplacer par l'utilisateur connecté
+        'Modification de la dépense'
+      );
+    }
+    
+    showNotification('Dépense modifiée avec succès', 'success');
+  }
+  
+  editDepenseModal.hide();
+  afficherDepenses();
+}
+
+function formatDate(dateString) {
+  const options = {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  };
+  return new Date(dateString).toLocaleDateString('fr-FR', options);
+}
+
+function supprimerRecette(index) {
+  const recettes = [...(window.appState?.data?.recettes || [])];
+  if (index >= 0 && index < recettes.length && window.appState) {
+    // Vérifier si c'est une recette principale avec des compléments
+    const recette = recettes[index];
+    const isComplement = !!recette.estComplementDe;
+    
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) {
+      // Sauvegarder la recette pour l'historique avant suppression
+      const recetteSupprimee = {...recette};
+      
+      // Supprimer les compléments associés si c'est une recette principale
+      if (recette.complements && recette.complements.length > 0) {
+        recette.complements.forEach(complement => {
+          const indexComplement = recettes.findIndex(r => r.id === complement.id);
+          if (indexComplement !== -1) {
+            recettes.splice(indexComplement, 1);
+          }
+        });
+      } else if (recette.estComplementDe) {
+        // Si c'est un complément, mettre à jour la recette principale
+        const indexPrincipal = recettes.findIndex(r => r.id === recette.estComplementDe);
+        if (indexPrincipal !== -1) {
+          const recettePrincipale = recettes[indexPrincipal];
+          if (recettePrincipale.complements && recettePrincipale.complements.length > 0) {
+            recettePrincipale.complements = recettePrincipale.complements.filter(
+              comp => comp.id !== recette.id
+            );
+            // Mettre à jour le montant total
+            recettePrincipale.montantTotal = recettePrincipale.complements.reduce(
+              (total, comp) => total + (parseInt(comp.montant, 10) || 0), 
+              recettePrincipale.montant || 0
+            );
+          }
+        }
+      }
+      
+      // Supprimer la recette actuelle
+      recettes.splice(index, 1);
+      
+      // Mettre à jour le stockage local
+      localStorage.setItem('recettes', JSON.stringify(recettes));
+      
+      // Enregistrer la suppression dans l'historique
+      if (typeof historiqueManager !== 'undefined') {
+        historiqueManager.enregistrerAction(
+          'suppression',
+          'recette',
+          recetteSupprimee,
+          'utilisateur', // Remplacer par l'utilisateur connecté
+          isComplement ? 'Complément de recette supprimé' : 'Recette supprimée'
+        );
+      }
+      
+      // Mettre à jour l'interface
+      afficherRecettes();
+      generateCalendar();
+      updateDashboard();
+      
+      showNotification(isComplement ? 'Complément supprimé avec succès' : 'Recette supprimée avec succès', 'success');
+    }
+  }
+}
+
+function supprimerDepense(index) {
+  const depenses = [...(window.appState?.data?.depenses || [])];
+  if (confirm("Voulez-vous vraiment supprimer cette dépense ?")) {
+    // Sauvegarder la dépense pour l'historique avant suppression
+    const depenseSupprimee = {...depenses[index]};
+    
+    // Libérer l'URL de l'image si elle existe
+    if (depenses[index]?.justificatif) {
+      URL.revokeObjectURL(depenses[index].justificatif);
+    }
+    
+    // Supprimer la dépense
+    depenses.splice(index, 1);
+    localStorage.setItem('depenses', JSON.stringify(depenses));
+    
+    // Enregistrer la suppression dans l'historique
+    if (typeof historiqueManager !== 'undefined') {
+      historiqueManager.enregistrerAction(
+        'suppression',
+        'depense',
+        depenseSupprimee,
+        'utilisateur', // Remplacer par l'utilisateur connecté
+        'Dépense supprimée'
+      );
+    }
+    
+    afficherDepenses();
+    showNotification('Dépense supprimée avec succès', 'success');
+  }
+}
+
+function mettreAJourTotaux() {
+  const today = new Date().toISOString().split('T')[0];
+  const thisMonth = today.slice(0, 7);
+  const thisWeek = getWeekNumber(new Date());
+
+  let totalJour = 0, totalSemaine = 0, totalMois = 0, totalRecettes = 0;
+  let depensesJour = 0, depensesSemaine = 0, depensesMois = 0, totalDepenses = 0;
+
+  // Récupérer les données depuis appState
+  const recettes = window.appState?.data?.recettes || [];
+  const depenses = window.appState?.data?.depenses || [];
+
+  // Calcul des totaux des recettes
+  recettes.forEach(r => {
+    if (!r || !r.date) return;
+    const montant = parseFloat(r.montant) || 0;
+    const recetteDate = new Date(r.date);
+    const recetteWeek = getWeekNumber(recetteDate);
+
+    if (r.date === today) totalJour += montant;
+    if (getWeekNumber(new Date(r.date)) === thisWeek) totalSemaine += montant;
+    if (r.date.startsWith(thisMonth)) totalMois += montant;
+    totalRecettes += montant;
+  });
+
+  // Calcul des totaux des dépenses
+  depenses.forEach(d => {
+    if (!d || !d.date) return;
+    const montant = parseFloat(d.montant) || 0;
+    const depenseDate = new Date(d.date);
+    const depenseWeek = getWeekNumber(depenseDate);
+
+    if (d.date === today) depensesJour += montant;
+    if (getWeekNumber(new Date(d.date)) === thisWeek) depensesSemaine += montant;
+    if (d.date.startsWith(thisMonth)) depensesMois += montant;
+    totalDepenses += montant;
+  });
+
+  // Mise à jour des totaux dans l'interface avec vérification des éléments
+  const safeUpdateElement = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value.toLocaleString() + ' XAF';
+  };
+
+  safeUpdateElement('totalJour', totalJour);
+  safeUpdateElement('depensesJour', depensesJour);
+  safeUpdateElement('profitJour', totalJour - depensesJour);
+  safeUpdateElement('totalProfit', totalRecettes - totalDepenses);
+
+  // Mettre à jour le statut de l'objectif journalier
+  const dailyTargetStatus = document.getElementById('dailyTargetStatus');
+  if (dailyTargetStatus && typeof DAILY_TARGET !== 'undefined') {
+    if (totalJour >= DAILY_TARGET) {
+      dailyTargetStatus.innerHTML = `<i class="ph ph-check-circle"></i> Objectif atteint`;
+    } else {
+      const remaining = DAILY_TARGET - totalJour;
+      dailyTargetStatus.innerHTML = `<i class="ph ph-warning"></i> Manque ${remaining.toLocaleString()} XAF`;
+    }
+  }
+}
+
+function getWeekNumber(date) {
+  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+  const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
+
+function updateLastModified() {
+  const now = new Date();
+  const options = {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  document.getElementById('lastUpdate').textContent = now.toLocaleDateString('fr-FR', options);
+}
+
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = 'position-fixed bottom-0 end-0 p-3';
+  notification.style.zIndex = '1050';
+  notification.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+function showImageModal(imageSrc) {
+  document.getElementById('modalImage').src = imageSrc;
+  imageModal.show();
+}
+
+// Fonctions d'export
+function exportToPDF(type) {
+  alert(`Export PDF (${type}) en cours de développement`);
+  // Implémentation réelle nécessiterait une librairie comme jsPDF
+}
+
+function exportToExcel(type) {
+  let data, fileName;
+
+  if (type === 'recettes') {
+    data = recettes.map(r => ({
+      Date: r.date,
+      Bus: r.matricule,
+      'Nom Bus': (getAvailableBuses().find(b => b.matricule === r.matricule) || {}).nom || 'Inconnu',
+      Montant: r.montant,
+      Commentaire: r.commentaire || '',
+      Statut: r.montant >= (new Date(r.date).getDay() === 0 ? HOLIDAY_TARGET : DAILY_TARGET) ? 'Atteint' : 'Non atteint'
+    }));
+    fileName = `recettes_ml_transport_${new Date().toISOString().slice(0,10)}.xlsx`;
+  } else {
+    data = depenses.map(d => ({
+      Date: d.date,
+      Type: d.type === 'bus' ? 'Bus' : 'Entreprise',
+      Bus: d.bus || '',
+      'Nom Bus': d.bus ? (getAvailableBuses().find(b => b.matricule === d.bus) || {}).nom || 'Inconnu' : '',
+      Motif: d.motif,
+      Montant: d.montant,
+      Détails: d.details || '',
+      'Justificatif': d.justificatif ? 'Oui' : 'Non'
+    }));
+    fileName = `depenses_ml_transport_${new Date().toISOString().slice(0,10)}.xlsx`;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, type === 'recettes' ? "Recettes" : "Dépenses");
+  XLSX.writeFile(wb, fileName);
+}
+
+function exportToCSV(type) {
+  try {
+    let data, fileName;
+
+    if (type === 'recettes') {
+      data = recettes.map(r => ({
+        Date: r.date,
+      Bus: r.matricule,
+      'Nom Bus': (getAvailableBuses().find(b => b.matricule === r.matricule) || {}).nom || 'Inconnu',
+      Montant: r.montant,
+      Commentaire: r.commentaire || '',
+      Statut: r.montant >= (new Date(r.date).getDay() === 0 ? HOLIDAY_TARGET : DAILY_TARGET) ? 'Atteint' : 'Non atteint'
+    }));
+    fileName = `recettes_ml_transport_${new Date().toISOString().slice(0,10)}.csv`;
+  } else {
+    data = depenses.map(d => ({
+      Date: d.date,
+      Type: d.type === 'bus' ? 'Bus' : 'Entreprise',
+      Bus: d.bus || '',
+      'Nom Bus': d.bus ? (getAvailableBuses().find(b => b.matricule === d.bus) || {}).nom || 'Inconnu' : '',
+      Motif: d.motif,
+      Montant: d.montant,
+      Détails: d.details || '',
+      'Justificatif': d.justificatif ? 'Oui' : 'Non'
+    }));
+    fileName = `depenses_ml_transport_${new Date().toISOString().slice(0,10)}.csv`;
+  }
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, type === 'recettes' ? "Recettes" : "Dépenses");
+    
+    // Utiliser XLSX.writeFile pour générer le fichier CSV
+    XLSX.writeFile(wb, fileName);
+  } catch (error) {
+    console.error('Erreur lors de l\'export CSV:', error);
+    showNotification('Erreur lors de l\'export CSV: ' + error.message, 'danger');
+  }
+}
+
+// Fonctions pour la gestion des recettes complémentaires
+function peutAvoirComplement(recette) {
+  if (!recette) return false;
+  
+  // Si c'est déjà un complément, on ne peut pas en ajouter un autre
+  if (recette.estComplement) return false;
+  
+  // Vérifier si la recette a déjà un complément
+  const aDejaUnComplement = recettes.some(r => r.recettePrincipaleId === recette.id);
+  if (aDejaUnComplement) return false;
+  
+  // Vérifier si la recette est complète par rapport à son objectif
+  const date = new Date(recette.date);
+  const target = getDailyTarget(date, recette.estExceptionnel);
+  
+  // On peut ajouter un complément si le montant est inférieur à l'objectif
+  return recette.montant < target;
+}
+
+function configurerComplement(recetteId) {
+  // Récupérer la recette principale
+  const recettePrincipale = recettes.find(r => r.id === recetteId);
+  
+  if (!recettePrincipale) return;
+  
+  // Calculer le montant restant pour atteindre l'objectif
+  const montantActuel = recettePrincipale.montantTotal || recettePrincipale.montant;
+  const dateRecette = new Date(recettePrincipale.date);
+  const isDimanche = dateRecette.getDay() === 0;
+  const objectif = isDimanche ? HOLIDAY_TARGET : DAILY_TARGET;
+  const montantRestant = Math.max(0, objectif - montantActuel);
+  
+  // Si l'objectif est déjà atteint, on ne permet pas d'ajouter de complément
+  if (montantRestant <= 0) {
+    showNotification('L\'objectif est déjà atteint pour cette recette', 'warning');
+    return;
+  }
+  
+  // Pré-remplir le formulaire avec les données de la recette principale
+  document.getElementById('dateRecette').value = recettePrincipale.date;
+  document.getElementById('matriculeBus').value = recettePrincipale.matricule;
+  document.getElementById('montantRecette').value = '';
+  document.getElementById('montantRecette').setAttribute('max', montantRestant);
+  document.getElementById('montantRecette').setAttribute('placeholder', `Max: ${montantRestant.toLocaleString()} FCFA`);
+  document.getElementById('commentaireRecette').value = '';
+  document.getElementById('estComplement').value = 'true';
+  document.getElementById('recettePrincipaleId').value = recettePrincipale.id;
+  document.getElementById('montantInitial').value = recettePrincipale.montantTotal || recettePrincipale.montant;
+  
+  // Mettre à jour le titre du formulaire et afficher le montant restant
+  document.getElementById('modalRecetteLabel').textContent = 'Ajouter un complément de recette';
+  document.getElementById('montantRestant').textContent = `Montant restant pour l'objectif: ${montantRestant.toLocaleString()} FCFA`;
+  
+  // Afficher le montant initial et le montant restant
+  document.getElementById('montantInitialContainer').classList.remove('d-none');
+  document.getElementById('montantRestantContainer').classList.remove('d-none');
+  
+  // Afficher le modal
+  const modal = new bootstrap.Modal(document.getElementById('modalRecette'));
+  modal.show();
+}
+
+function reinitialiserFormulaire() {
+  const now = new Date();
+  const todayFormatted = now.toISOString().split('T')[0];
+  
+  document.getElementById('recetteForm').reset();
+  
+  // Mettre à jour le champ de date s'il existe
+  const dateRecette = document.getElementById('dateRecette');
+  if (dateRecette) dateRecette.value = todayFormatted;
+  
+  document.getElementById('recetteId').value = '';
+  document.getElementById('estComplement').value = 'false';
+  document.getElementById('recettePrincipaleId').value = '';
+  document.getElementById('montantInitialHidden').value = '0';
+  document.getElementById('montantRestantContainer').classList.add('d-none');
+  document.getElementById('montantRecette').removeAttribute('max');
+  document.getElementById('montantRecette').removeAttribute('placeholder');
+  document.querySelector('button[type="submit"]').innerHTML = '<i class="ph ph-plus-circle"></i> Ajouter Recette';
+  document.getElementById('btnAjouterComplement').classList.add('d-none');
+}
+
+// Fonctions pour le calendrier des coches
+function generateCalendar() {
+  const monthYear = monthSelect.value;
+  const selectedBus = busCalendarSelect.value;
+  
+  if (!monthYear) return;
+
+  const [year, month] = monthYear.split('-').map(Number);
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  
+  // Fonction pour obtenir le statut d'une journée en tenant compte des compléments et des jours exceptionnels
+  function getDayStatus(date) {
+    const dateStr = date.toISOString().split('T')[0];
+    const dayRecettes = selectedBus === 'all' 
+      ? recettes.filter(function(r) { return r.date === dateStr; })
+      : recettes.filter(function(r) { return r.date === dateStr && r.matricule === selectedBus; });
+      
+    if (dayRecettes.length === 0) return 'empty';
+    
+    // Vérifier s'il y a une recette exceptionnelle
+    const exceptionRecette = dayRecettes.find(function(r) { return r.estExceptionnel; });
+    
+    // Calculer le total des recettes pour la journée (en tenant compte des compléments)
+    let total = 0;
+    const processedIds = new Set();
+    
+    dayRecettes.forEach(function(recette) {
+      if (recette.estComplement) {
+        // Le complément est traité avec sa recette principale
+        return;
+      }
+      
+      const complement = recettes.find(function(r) { return r.recettePrincipaleId === recette.id; });
+      if (complement) {
+        total += recette.montant + complement.montant;
+        processedIds.add(recette.id);
+        processedIds.add(complement.id);
+      } else if (!processedIds.has(recette.id)) {
+        total += recette.montant;
+        processedIds.add(recette.id);
+      }
+    });
+    
+    // Déterminer la cible en fonction du type de jour
+    let target;
+    const isSunday = date.getDay() === 0;
+    
+    if (exceptionRecette) {
+      // Pour les jours exceptionnels, on soustrait 5000 de la cible normale
+      target = (isSunday ? HOLIDAY_TARGET : DAILY_TARGET) - 5000;
+      return 'exception'; // On retourne 'exception' pour le style, mais on utilise la cible ajustée
+    } else {
+      target = isSunday ? HOLIDAY_TARGET : DAILY_TARGET;
+    }
+    
+    // Si le total est supérieur ou égal à la cible, c'est un succès
+    if (total >= target) return 'complete';
+    
+    // Si on a des recettes mais qu'elles ne couvrent pas l'objectif
+    return 'partial';
+  }
+  const daysInMonth = lastDay.getDate();
+  const firstDayOfWeek = firstDay.getDay(); // 0 (dimanche) à 6 (samedi)
+
+  // Ajustement pour que le lundi soit le premier jour de la semaine
+  const adjustedFirstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  const monthName = firstDay.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+  let calendarHTML = `
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="month-header">
+          <div class="month-title">${monthName.charAt(0).toUpperCase() + monthName.slice(1)}</div>
+          <div class="month-nav">
+            <button class="btn btn-sm btn-outline-primary" onclick="navigateMonth(-1)">
+              <i class="ph ph-caret-left"></i> Précédent
+            </button>
+            <button class="btn btn-sm btn-outline-primary" onclick="navigateMonth(1)">
+              Suivant <i class="ph ph-caret-right"></i>
+            </button>
+          </div>
+        </div>
+        <table class="calendar">
+          <thead>
+            <tr>
+              <th>Lun</th>
+              <th>Mar</th>
+              <th>Mer</th>
+              <th>Jeu</th>
+              <th>Ven</th>
+              <th>Sam</th>
+              <th>Dim</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+
+  let day = 1;
+  let today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < 6; i++) { // 6 semaines max pour couvrir tous les cas
+    if (day > daysInMonth) break;
+
+    calendarHTML += '<tr>';
+
+    for (let j = 0; j < 7; j++) {
+      if ((i === 0 && j < adjustedFirstDayOfWeek) || day > daysInMonth) {
+        // Cellule vide avant le premier jour ou après le dernier jour du mois
+        calendarHTML += '<td></td>';
+      } else {
+        const currentDate = new Date(year, month - 1, day);
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = currentDate.getTime() === today.getTime();
+        const isFuture = currentDate > today;
+
+        // Vérifier l'état des recettes pour ce jour et ce bus
+        const dayStatus = getDayStatus(currentDate);
+        let badgeClass = '';
+        let badgeIcon = '';
+        
+        // Déterminer la classe et l'icône du badge en fonction du statut
+        switch (dayStatus) {
+          case 'complete':
+            badgeClass = 'badge-complete';
+            badgeIcon = '<i class="ph ph-check"></i>';
+            break;
+          case 'partial':
+            badgeClass = 'badge-partial';
+            badgeIcon = '<i class="ph ph-warning"></i>';
+            break;
+          case 'exception':
+            badgeClass = 'badge-exception';
+            badgeIcon = '<i class="ph ph-star"></i>';
+            break;
+          default:
+            badgeClass = 'badge-none';
+            badgeIcon = '<i class="ph ph-x"></i>';
+        }
+        
+        // Vérifier s'il y a un complément pour ce jour
+        const hasComplement = recettes.some(function(r) { 
+          return r.date === dateStr && 
+                 (r.estComplement || r.recettePrincipaleId) &&
+                 (selectedBus === 'all' || r.matricule === selectedBus);
+        });
+        
+        // Ajouter la classe has-complement si nécessaire
+        const cellClasses = ['day-cell', dayStatus];
+        if (hasComplement) {
+          cellClasses.push('has-complement');
+        }
+
+        calendarHTML += `
+          <td class="${cellClasses.join(' ')}" data-date="${dateStr}" data-status="${dayStatus}">
+            <div class="calendar-day">${day}</div>
+            <div class="day-badge ${badgeClass}" title="${getDayTooltip(currentDate, dayStatus, selectedBus)}">
+              ${badgeIcon}
+            </div>
+          </td>
+        `;
+        day++;
+      }
+    }
+
+    calendarHTML += '</tr>';
+  }
+
+  calendarHTML += `
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  calendarContainer.innerHTML = calendarHTML;
+}
+
+function navigateMonth(offset) {
+  const currentMonth = monthSelect.value;
+  if (!currentMonth) return;
+
+  const [year, month] = currentMonth.split('-').map(Number);
+  let newMonth = month + offset;
+  let newYear = year;
+
+  if (newMonth > 12) {
+    newMonth = 1;
+    newYear++;
+  } else if (newMonth < 1) {
+    newMonth = 12;
+    newYear--;
+  }
+
+  monthSelect.value = `${newYear}-${String(newMonth).padStart(2, '0')}`;
+  generateCalendar();
+}
+
+function formatDateForDisplay(dateStr) {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateStr).toLocaleDateString('fr-FR', options);
+}
+
+function getRecetteStatus(recette) {
+  if (recette.estExceptionnel) {
+    return 'exception';
+  }
+  if (recette.estComplement) {
+    return 'complement';
+  }
+  if (recette.montant >= (new Date(recette.date).getDay() === 0 ? HOLIDAY_TARGET : DAILY_TARGET)) {
+    return 'complete';
+  }
+  return 'partial';
+}
+
+function getDayReceiptStatus(dateStr, selectedBus = 'all') {
+  let dayRecettes = recettes.filter(r => r.date === dateStr);
+  
+  // Filtrer par bus si un bus spécifique est sélectionné
+  if (selectedBus !== 'all') {
+    dayRecettes = dayRecettes.filter(r => r.matricule === selectedBus);
+  }
+
+  // Vérifier s'il y a des recettes marquées comme jour exceptionnel
+  const hasException = dayRecettes.some(r => r.estExceptionnel === true);
+  
+  // Si c'est un jour exceptionnel, on retourne 'exception' pour éviter le statut 'partial'
+  if (hasException) {
+    return 'exception';
+  }
+
+  const dayDate = new Date(dateStr);
+  const isHoliday = dayDate.getDay() === 0; // Dimanche
+  const target = isHoliday ? HOLIDAY_TARGET : DAILY_TARGET;
+
+  if (dayRecettes.length === 0) {
+    // Vérifier si la deadline est passée
+    const now = new Date();
+    const deadline = new Date(dateStr);
+    deadline.setHours(DEADLINE_HOUR, DEADLINE_MINUTE, 0, 0);
+
+    return now > deadline ? 'none' : 'future';
+  }
+
+  // Si on filtre par bus, on vérifie simplement si le montant atteint la cible
+  if (selectedBus !== 'all') {
+    const total = dayRecettes.reduce((sum, r) => sum + r.montant, 0);
+    return total >= target ? 'complete' : 'partial';
+  }
+
+  // Pour "Tous les bus", vérifier si tous les bus en service ont déclaré leurs recettes
+  const activeBuses = getAvailableBuses().filter(b => b.service === 'Oui');
+  const busesWithReceipts = [...new Set(dayRecettes.map(r => r.matricule))];
+  const total = dayRecettes.reduce((sum, r) => sum + r.montant, 0);
+
+  if (busesWithReceipts.length === activeBuses.length) {
+    return total >= target ? 'complete' : 'partial';
+  } else {
+    return 'partial';
+  }
+}
+
+function getDayTooltip(dateStr, status, selectedBus = 'all') {
+  // Vérifier si c'est un jour exceptionnel
+  const date = new Date(dateStr);
+  const recette = recettes.find(r => {
+    const recetteDate = new Date(r.date);
+    return (
+      recetteDate.getFullYear() === date.getFullYear() &&
+      recetteDate.getMonth() === date.getMonth() &&
+      recetteDate.getDate() === date.getDate() &&
+      r.estExceptionnel
+    );
+  });
+
+  // Calculer le total pour ce jour
+  const dayRecettes = recettes.filter(r => {
+    const recetteDate = new Date(r.date);
+    return (
+      recetteDate.getFullYear() === date.getFullYear() &&
+      recetteDate.getMonth() === date.getMonth() &&
+      recetteDate.getDate() === date.getDate()
+    );
+  });
+  
+  const total = dayRecettes.reduce((sum, r) => sum + (r.montant || 0), 0);
+  const isExceptionnel = recette ? recette.estExceptionnel : false;
+  const target = getDailyTarget(date, isExceptionnel);
+  
+  if (recette) {
+    const typeException = recette.typeException === 'ferie' ? 'jour férié' : 'période de congé';
+    const comment = recette.commentaire ? `\nCommentaire: ${recette.commentaire}` : '';
+    return `Jour exceptionnel (${typeException}) - Montant: ${total.toLocaleString()} XAF${comment}`;
+  }
+
+  const percentage = Math.round((total / target) * 100);
+  
+  if (status === 'complete') {
+    return `Objectif atteint (${percentage}%) - ${total.toLocaleString()} / ${target.toLocaleString()} XAF`;
+  } else if (status === 'partial') {
+    return `Objectif non atteint (${percentage}%) - ${total.toLocaleString()} / ${target.toLocaleString()} XAF`;
+  } else if (status === 'none') {
+    return `Aucune recette enregistrée pour ce jour.`;
+  } else {
+    return `Montant: ${total.toLocaleString()} XAF`;
+  }
+}
+
+// Fonction pour obtenir l'objectif du jour en fonction de la date et du type de jour
+function getDailyTarget(date, isExceptionnel = false) {
+  const isSunday = date.getDay() === 0;
+  const baseTarget = isSunday ? HOLIDAY_TARGET : DAILY_TARGET;
+  
+  // Réduire de 5000 FCFA pour les jours exceptionnels (fériés/congés)
+  return isExceptionnel ? Math.max(0, baseTarget - 5000) : baseTarget;
+}
+
+// Gestionnaire pour le formulaire de dépense
+const depenseForm = document.getElementById('depenseForm');
+if (depenseForm) {
+  depenseForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // Récupérer le bouton de soumission
+  const submitBtn = depenseForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
+  
+  try {
+    // Récupérer les valeurs du formulaire
+    const montant = parseFloat(document.getElementById('montantDepense').value);
+    const date = document.getElementById('dateDepense').value;
+    const typeDepense = document.getElementById('typeDepense').value;
+    const bus = typeDepense === 'bus' ? document.getElementById('busDepense').value : null;
+    const motif = document.getElementById('motifDepense').value;
+    const details = document.getElementById('detailsDepense').value;
+    const justificatif = document.getElementById('justificatifDepense').files[0];
+    
+    // Validation des champs obligatoires
+    if (!montant || isNaN(montant) || montant <= 0) {
+      showNotification('Veuillez entrer un montant valide', 'error');
+      return;
+    }
+
+    if (!date) {
+      showNotification('Veuillez sélectionner une date', 'error');
+      return;
+    }
+    
+    if (!motif) {
+      showNotification('Veuillez saisir un motif pour la dépense', 'error');
+      return;
+    }
+    
+    if (typeDepense === 'bus' && !bus) {
+      showNotification('Veuillez sélectionner un bus', 'error');
+      return;
+    }
+
+    // Créer un nouvel ID unique
+    const id = 'dep-' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+    
+    // Créer l'objet dépense
+    const nouvelleDepense = {
+      id,
+      date,
+      type: typeDepense,
+      bus: typeDepense === 'bus' ? bus : null,
+      motif,
+      montant,
+      details,
+      justificatif: justificatif ? justificatif.name : null,
+      dateCreation: new Date().toISOString(),
+      dateModification: new Date().toISOString()
+    };
+
+    // Ajouter la dépense au tableau et sauvegarder
+    depenses.push(nouvelleDepense);
+    localStorage.setItem('depenses', JSON.stringify(depenses));
+    
+    // Mettre à jour l'historique
+    const historique = JSON.parse(localStorage.getItem('historique')) || [];
+    historique.push({
+      action: 'Création',
+      type: 'dépense',
+      id,
+      date: new Date().toISOString(),
+      details: `Ajout d'une dépense de ${montant} XAF pour ${motif}`
+    });
+    localStorage.setItem('historique', JSON.stringify(historique));
+    
+    // Réinitialiser le formulaire
+    depenseForm.reset();
+    document.getElementById('busFieldDepense').classList.add('d-none');
+    
+    // Mettre à jour l'interface utilisateur
+    afficherDepenses();
+    updateDashboard();
+    generateCalendar();
+    showNotification('Dépense enregistrée avec succès', 'success');
+    
+    // Animation pour la nouvelle dépense
+    const lastCard = depenseList.lastElementChild;
+    if (lastCard) {
+      lastCard.classList.add('new-entry');
+      setTimeout(() => lastCard.classList.remove('new-entry'), 1000);
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement de la dépense:', error);
+    showNotification('Une erreur est survenue lors de l\'enregistrement: ' + error.message, 'error');
+  } finally {
+    // Toujours réinitialiser le bouton, même en cas d'erreur
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+});
+} // Fermeture de la condition if (depenseForm)
+
+// Gestionnaire pour afficher/masquer le champ de sélection du bus
+const typeDepenseSelect = document.getElementById('typeDepense');
+if (typeDepenseSelect) {
+  typeDepenseSelect.addEventListener('change', function() {
+    const busField = document.getElementById('busFieldDepense');
+    if (busField) {
+      if (this.value === 'bus') {
+        busField.classList.remove('d-none');
+      } else {
+        busField.classList.add('d-none');
+      }
+    }
+  });
+}
+
+// Gestionnaire pour le bouton d'ajout de complément
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.closest('#btnAjouterComplement')) {
+    const recetteId = e.target.closest('#btnAjouterComplement').getAttribute('data-recette-id');
+    const recette = recettes.find(r => r.id === recetteId);
+    if (recette) {
+      configurerComplement(recetteId);
+      document.getElementById('recetteForm').scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+});
+
+// Gestionnaire pour le formulaire de recette
+const recetteForm = document.getElementById('recetteForm');
+if (recetteForm) {
+  recetteForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  // Afficher un indicateur de chargement
+  const submitBtn = recetteForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
+  
+  try {
+    const date = document.getElementById('dateRecette').value;
+    const matricule = document.getElementById('matriculeBus').value;
+    const montant = parseInt(document.getElementById('montantRecette').value, 10);
+    const commentaire = document.getElementById('commentaireRecette').value;
+    const estUnComplement = document.getElementById('estComplement').value === 'true';
+    const recettePrincipaleId = document.getElementById('recettePrincipaleId').value || null;
+    
+    // Si ce n'est pas un complément, vérifier les doublons
+    if (!estUnComplement) {
+      const recetteExistante = recettes.some(r => r.date === date && r.matricule === matricule && !r.estComplement);
+      if (recetteExistante) {
+        showNotification('Une recette existe déjà pour ce bus à cette date', 'warning');
+        throw new Error('Recette en doublon');
+      }
+    }
+    
+    // Récupération du type de jour exceptionnel
+    const jourExceptionnel = document.querySelector('input[name="jourExceptionnel"]:checked').value;
+    const estExceptionnel = jourExceptionnel !== '';
+
+    if (!matricule) {
+      showNotification('❌ Veuillez sélectionner un bus valide', 'danger', 3000);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+      return;
+    }
+
+    const newReceipt = { 
+      id: Date.now().toString(),
+      date, 
+      matricule, 
+      montant,
+      montantInitial: estUnComplement ? parseFloat(document.getElementById('montantInitialHidden').value) : montant,
+      commentaire,
+      estExceptionnel,
+      typeException: estExceptionnel ? jourExceptionnel : null,
+      estComplement: estUnComplement,
+      recettePrincipaleId,
+      dateCreation: new Date().toISOString()
+    };
+    
+    // Si c'est un complément, on vérifie qu'il n'y a pas déjà un complément pour cette recette
+    if (estUnComplement && recettePrincipaleId) {
+      const recettePrincipale = recettes.find(r => r.id === recettePrincipaleId);
+      if (recettePrincipale) {
+        // Vérifier que le montant du complément ne dépasse pas le montant restant pour atteindre l'objectif
+        const montantActuel = recettePrincipale.montantTotal || recettePrincipale.montant;
+        const dateRecette = new Date(recettePrincipale.date);
+        const isDimanche = dateRecette.getDay() === 0;
+        const objectif = isDimanche ? HOLIDAY_TARGET : DAILY_TARGET;
+        const montantRestant = objectif - montantActuel;
+        
+        if (montant > montantRestant) {
+          showNotification(`Le montant du complément ne peut pas dépasser ${montantRestant.toLocaleString()} FCFA`, 'warning');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+          return;
+        }
+        
+        recettePrincipale.montantTotal = montantActuel + montant;
+      }
+    }
+    recettes.push(newReceipt);
+    localStorage.setItem('recettes', JSON.stringify(recettes));
+
+    // Réinitialiser le formulaire
+    reinitialiserFormulaire();
+    
+    // Mettre à jour l'interface utilisateur
+    afficherRecettes();
+    generateCalendar();
+    showNotification('Recette enregistrée avec succès', 'success');
+
+    // Animation pour la nouvelle recette
+    const lastCard = recetteList.lastElementChild;
+    if (lastCard) {
+      lastCard.classList.add('new-entry');
+      setTimeout(() => lastCard.classList.remove('new-entry'), 1000);
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement de la recette:', error);
+    showNotification('Une erreur est survenue lors de l\'enregistrement', 'error');
+  } finally {
+    // Toujours réinitialiser le bouton, même en cas d'erreur
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="ph ph-plus-circle"></i> Ajouter Recette';
+  }
+});
+} // Fermeture de la condition if (recetteForm)
+
+// Mettre à jour les écouteurs d'événements pour utiliser window.appElements
+if (window.appElements && window.appElements.searchRecette) {
+  window.appElements.searchRecette.addEventListener('input', (e) => {
+    afficherRecettes(e.target.value);
+  });
+}
+
+if (window.appElements && window.appElements.filterBus) {
+  window.appElements.filterBus.addEventListener('change', () => {
+    const searchValue = window.appElements.searchRecette ? window.appElements.searchRecette.value : '';
+    afficherRecettes(searchValue);
+  });
+}
+
+// Gestion du changement de type de dépense dans le formulaire d'édition
+const editDepenseType = document.getElementById('editDepenseType');
+if (editDepenseType) {
+  editDepenseType.addEventListener('change', function() {
+    const editBusField = document.getElementById('editBusFieldDepense');
+    if (editBusField) {
+      if (this.value === 'bus') {
+        editBusField.classList.remove('d-none');
+      } else {
+        editBusField.classList.add('d-none');
+      }
+    }
+  });
+}
+
+// Fonction pour initialiser les sélecteurs de date
+function initDatePickers() {
+  console.log('Initialisation des sélecteurs de date...');
+  
+  try {
+    // Vérifier si flatpickr est disponible
+    if (typeof flatpickr !== 'undefined') {
+      // Initialiser les datepickers avec flatpickr
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => {
+        try {
+          // Vérifier si le champ de date est déjà initialisé
+          if (input._flatpickr) {
+            input._flatpickr.destroy();
+          }
+          
+          flatpickr(input, {
+            dateFormat: 'Y-m-d',
+            allowInput: true,
+            locale: 'fr',
+            disableMobile: true, // Désactive le sélecteur natif sur mobile
+            defaultDate: input.value || 'today',
+            onChange: function(selectedDates, dateStr, instance) {
+              // Mettre à jour la valeur du champ avec le bon format
+              input.value = dateStr;
+            }
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'initialisation du datepicker pour', input.id || input.name, ':', error);
+        }
+      });
+    } else {
+      console.warn('flatpickr n\'est pas chargé, utilisation des champs date natifs');
+      
+      // S'assurer que les champs de date ont le bon format
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      const today = new Date().toISOString().split('T')[0];
+      
+      dateInputs.forEach(input => {
+        if (!input.value) {
+          input.value = today;
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Erreur dans initDatePickers:', error);
+    throw error;
+  }
+}
+
+// Fonction pour initialiser les écouteurs d'événements
+/**
+ * Initialise les écouteurs d'événements de l'application
+ */
+function initEventListeners() {
+  try {
+    console.log('Initialisation des écouteurs d\'événements...');
+    
+    // Filtre de bus
+    const filterBus = document.getElementById('filterBus');
+    if (filterBus) {
+      // Supprimer les écouteurs existants pour éviter les doublons
+      const newFilterBus = filterBus.cloneNode(true);
+      filterBus.parentNode.replaceChild(newFilterBus, filterBus);
+      
+      // Ajouter le nouvel écouteur
+      newFilterBus.addEventListener('change', () => {
+        const searchValue = document.getElementById('searchRecette')?.value || '';
+        afficherRecettes(searchValue);
+      });
+    }
+    
+    // Gestion du type de dépense
+    const typeDepense = document.getElementById('typeDepense');
+    if (typeDepense) {
+      const busField = document.getElementById('busFieldDepense');
+      typeDepense.addEventListener('change', function() {
+        if (busField) {
+          if (this.value === 'bus') {
+            busField.classList.remove('d-none');
+          } else {
+            busField.classList.add('d-none');
+          }
+        }
+      });
+    }
+    
+    // Champ de recherche
+    const searchRecette = document.getElementById('searchRecette');
+    if (searchRecette) {
+      // Supprimer les écouteurs existants pour éviter les doublons
+      const newSearchRecette = searchRecette.cloneNode(true);
+      searchRecette.parentNode.replaceChild(newSearchRecette, searchRecette);
+      
+      // Ajouter le nouvel écouteur avec un délai pour éviter les appels trop fréquents
+      let searchTimeout;
+      newSearchRecette.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          afficherRecettes(e.target.value);
+        }, 300); // Délai de 300ms
+      });
+    }
+    
+    // Initialiser les sélecteurs de date
+    initDatePickers();
+    
+    console.log('Écouteurs d\'événements initialisés avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation des écouteurs d\'événements:', error);
+    throw error;
+  }
+}
+
+// Fin du script principal
+</script>
+
+<!-- Inclusion des scripts externes -->
+<script src="public/js/modules/include-navbar.js"></script>
+<script src="public/js/modules/historique.js"></script>
+
+<!-- Notre script principal -->
+<script>
+// Fonction pour attendre le chargement de la navbar
+function waitForNavbar() {
+      return new Promise((resolve) => {
+        const checkNavbar = () => {
+          const navbar = document.querySelector('.navbar');
+          if (navbar) {
+            console.log('Navbar trouvée:', navbar.outerHTML);
+            resolve();
+          } else {
+            console.log('En attente du chargement de la navbar...');
+            setTimeout(checkNavbar, 100);
+          }
+        };
+        checkNavbar();
+      });
+    }
+
+    // Fonction pour initialiser les menus déroulants
+    function initializeDropdowns() {
+      try {
+        const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+        console.log('Initialisation de', dropdownElementList.length, 'menus déroulants...');
+        
+        const dropdownList = dropdownElementList.forEach(function (dropdownToggleEl) {
+          if (!dropdownToggleEl) {
+            console.warn('Élément dropdown-toggle non trouvé');
+            return;
+          }
+          
+          // Vérifier si le dropdown est déjà initialisé
+          if (dropdownToggleEl.hasAttribute('data-bs-toggle') && 
+              dropdownToggleEl.getAttribute('data-bs-toggle') === 'dropdown') {
+            return; // Déjà initialisé
+          }
+          
+          try {
+            // Initialiser le dropdown avec Bootstrap
+            dropdownToggleEl.setAttribute('data-bs-toggle', 'dropdown');
+            dropdownToggleEl.setAttribute('aria-expanded', 'false');
+            
+            // Vérifier si le menu déroulant existe
+            const dropdownMenu = dropdownToggleEl.nextElementSibling;
+            if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) {
+              console.warn('Menu déroulant non trouvé pour', dropdownToggleEl);
+              return;
+            }
+            
+            // Initialiser avec l'API Bootstrap
+            const dropdown = new bootstrap.Dropdown(dropdownToggleEl, {
+              autoClose: true,
+              boundary: 'clippingParents'
+            });
+            
+            console.log('Menu déroulant initialisé:', dropdownToggleEl);
+          } catch (error) {
+            console.error('Erreur lors de l\'initialisation du menu déroulant:', error);
+          }
+        });
+      } catch (error) {
+        console.error('Erreur critique lors de l\'initialisation des menus déroulants:', error);
+      }
+    }
+
+// Fonction pour initialiser les écouteurs d'événements de l'application
+function initAppEventListeners() {
+  console.log('Initialisation des écouteurs d\'événements de l\'application...');
+  
+  try {
+    // Écouteurs pour les filtres
+    const filterBus = document.getElementById('filterBus');
+    if (filterBus) {
+      filterBus.addEventListener('change', () => afficherRecettes());
+    }
+    
+    // Gestion des boutons de navigation
+    const navButtons = document.querySelectorAll('.btn-group .btn');
+    navButtons.forEach(button => {
+      // Supprimer les anciens écouteurs pour éviter les doublons
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      
+      // Ajouter le nouvel écouteur
+      newButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const sectionName = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+        console.log('Bouton cliqué:', sectionName);
+        openModal(sectionName);
+      });
+    });
+    
+    // Écouteur pour le sélecteur de mois
+    const monthSelect = document.getElementById('monthSelect');
+    if (monthSelect) {
+      monthSelect.addEventListener('change', () => generateCalendar());
+    }
+    
+    // Écouteur pour le sélecteur de bus du calendrier
+    const busCalendarSelect = document.getElementById('busCalendarSelect');
+    if (busCalendarSelect) {
+      busCalendarSelect.addEventListener('change', () => generateCalendar());
+    }
+      
+    console.log('Écouteurs d\'événements initialisés avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation des écouteurs d\'événements:', error);
+    throw error;
+  }
+}
+
+// Fonction d'initialisation principale
+async function initializeApplication() {
+  try {
+    console.log('Initialisation de l\'application...');
+    
+    // 1. Attendre que la navbar soit chargée
+    await waitForNavbar();
+    
+    // 2. Initialiser les composants de base
+    if (typeof initializeAppComponents === 'function') {
+      await safeCall(initializeAppComponents, 'initializeAppComponents');
+    }
+    
+    // 3. Initialiser les menus déroulants
+    if (typeof initializeDropdowns === 'function') {
+      await safeCall(initializeDropdowns, 'initializeDropdowns');
+    }
+    
+    // 4. Initialiser les écouteurs d'événements
+    if (typeof initEventListeners === 'function') {
+      await safeCall(initEventListeners, 'initEventListeners');
+    }
+    
+    // 5. Charger les données initiales
+    if (typeof loadInitialData === 'function') {
+      await safeCall(loadInitialData, 'loadInitialData');
+    }
+    
+    console.log('Application initialisée avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation de l\'application:', error);
+    showNotification('Une erreur est survenue lors du chargement de l\'application', 'error');
+  }
+}
+
+  </script>
+  
+  <!-- Scripts JS -->
+  <script src="/js/modules/finance/finance.js" type="module"></script>
+  <!-- 1. Bibliothèques tierces -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- 2. Scripts utilitaires -->
+  <script>
+    // Vérifier si le script est déjà chargé pour éviter les doublons
+    if (!window.ML_SCRIPTS_LOADED) {
+      window.ML_SCRIPTS_LOADED = {};
+    }
+    
+    // Fonction pour charger un script de manière asynchrone
+    function loadScript(src, callback) {
+      if (window.ML_SCRIPTS_LOADED[src]) {
+        if (callback) callback();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = function() {
+        window.ML_SCRIPTS_LOADED[src] = true;
+        if (callback) callback();
+      };
+      script.onerror = function() {
+        console.error('Erreur de chargement du script:', src);
+      };
+      document.head.appendChild(script);
+    }
+    
+    // Fonction d'initialisation de l'application
+    function initializeApp() {
+      // Vérifier que toutes les dépendances sont chargées
+      if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap n\'est pas chargé');
+        return;
+      }
+      
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js n\'est pas chargé');
+        return;
+      }
+      
+      if (typeof flatpickr === 'undefined') {
+        console.error('Flatpickr n\'est pas chargé');
+        return;
+      }
+      
+      // Démarrer l'initialisation
+      if (typeof initializeApplication === 'function') {
+        console.log('Initialisation de l\'application...');
+        try {
+          initializeApplication();
+        } catch (error) {
+          console.error('Erreur lors de l\'initialisation de l\'application:', error);
+        }
+      } else {
+        console.error('La fonction initializeApplication n\'est pas définie');
+      }
+    }
+    
+    // Charger les scripts de manière séquentielle
+    function loadScripts() {
+      console.log('Début du chargement des scripts...');
+      
+      // Charger d'abord les dépendances critiques
+      loadScript('./js/include-navbar.js', function() {
+        console.log('Navbar chargée');
+        
+        loadScript('./js/app.js', function() {
+          console.log('App.js chargé');
+          
+          loadScript('./js/historique.js', function() {
+            console.log('Historique chargé');
+            
+            loadScript('./js/finance.js', function() {
+              console.log('Finance.js chargé, initialisation...');
+              initializeApp();
+            });
+          });
+        });
+      });
+    }
+    
+    // Démarrer le chargement des scripts
+    if (document.readyState === 'loading') {
+      console.log('En attente du chargement du DOM...');
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM chargé, démarrage du chargement des scripts...');
+        loadScripts();
+      });
+    } else {
+      console.log('DOM déjà chargé, démarrage immédiat du chargement des scripts...');
+      loadScripts();
+    }
+  </script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

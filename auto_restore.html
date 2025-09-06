@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restauration automatique des données</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .file-input {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success { background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+        .error { background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+        button {
+            background-color: #5bc0de;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #46b8da;
+        }
+    </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet"></head>
+<body>
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+    <h1>Restauration des données financières</h1>
+    
+    <div class="file-input">
+        <h3>1. Sélectionnez les fichiers de sauvegarde</h3>
+        <p>
+            <label for="recettesFile">Fichier des recettes (recettes_*.json):</label><br>
+            <input type="file" id="recettesFile" accept=".json">
+        </p>
+        <p>
+            <label for="depensesFile">Fichier des dépenses (depenses_*.json):</label><br>
+            <input type="file" id="depensesFile" accept=".json">
+        </p>
+        <p>
+            <label for="vehiculesFile">Fichier des véhicules (vehicules_*.json):</label><br>
+            <input type="file" id="vehiculesFile" accept=".json">
+        </p>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <button id="restoreBtn">Restaurer les données</button>
+    </div>
+
+    <div id="status"></div>
+
+    <script>
+        document.getElementById('restoreBtn').addEventListener('click', async function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'none';
+            
+            try {
+                // Vérifier que tous les fichiers sont sélectionnés
+                const recettesFile = document.getElementById('recettesFile').files[0];
+                const depensesFile = document.getElementById('depensesFile').files[0];
+                const vehiculesFile = document.getElementById('vehiculesFile').files[0];
+
+                if (!recettesFile || !depensesFile || !vehiculesFile) {
+                    throw new Error('Veuillez sélectionner les trois fichiers de sauvegarde');
+                }
+
+                // Lire les fichiers
+                const readFile = (file) => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(JSON.parse(e.target.result));
+                        reader.onerror = (e) => reject(new Error('Erreur lors de la lecture du fichier'));
+                        reader.readAsText(file);
+                    });
+                };
+
+                // Lire tous les fichiers en parallèle
+                const [recettes, depenses, vehicules] = await Promise.all([
+                    readFile(recettesFile),
+                    readFile(depensesFile),
+                    readFile(vehiculesFile)
+                ]);
+
+                // Sauvegarder dans le localStorage
+                localStorage.setItem('recettes', JSON.stringify(recettes));
+                localStorage.setItem('depenses', JSON.stringify(depenses));
+                localStorage.setItem('vehicules', JSON.stringify(vehicules));
+
+                // Afficher le succès
+                statusDiv.className = 'success';
+                statusDiv.innerHTML = `
+                    <h3>Restauration réussie !</h3>
+                    <p>Données restaurées avec succès :</p>
+                    <ul>
+                        <li>${recettes.length} recettes</li>
+                        <li>${depenses.length} dépenses</li>
+                        <li>${vehicules.length} véhicules</li>
+                    </ul>
+                    <p>Vous pouvez maintenant rafraîchir la page de l'application pour voir les changements.</p>
+                `;
+                statusDiv.style.display = 'block';
+
+            } catch (error) {
+                statusDiv.className = 'error';
+                statusDiv.innerHTML = `
+                    <h3>Erreur lors de la restauration</h3>
+                    <p>${error.message || 'Une erreur inconnue est survenue'}</p>
+                    <p>Veuillez vérifier que les fichiers sélectionnés sont valides et réessayer.</p>
+                `;
+                statusDiv.style.display = 'block';
+                console.error('Erreur lors de la restauration:', error);
+            }
+        });
+    </script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

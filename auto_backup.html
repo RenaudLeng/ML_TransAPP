@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sauvegarde automatique des données</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+    <script>
+        function saveToFile(filename, data) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            return true;
+        }
+
+        function backupAllData() {
+            try {
+                const now = new Date();
+                const timestamp = now.toISOString().replace(/[:.]/g, '-');
+                
+                // Récupérer les données du localStorage
+                const recettes = JSON.parse(localStorage.getItem('recettes') || '[]');
+                const depenses = JSON.parse(localStorage.getItem('depenses') || '[]');
+                const vehicules = JSON.parse(localStorage.getItem('vehicules') || '[]');
+                
+                // Filtrer les données pour les dates du 19-20 août 2025
+                const startDate = new Date('2025-08-19T00:00:00');
+                const endDate = new Date('2025-08-20T23:59:59');
+                
+                const filteredRecettes = recettes.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate >= startDate && itemDate <= endDate;
+                });
+                
+                const filteredDepenses = depenses.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate >= startDate && itemDate <= endDate;
+                });
+                
+                // Sauvegarder les données
+                saveToFile(`recettes_${timestamp}.json`, filteredRecettes);
+                saveToFile(`depenses_${timestamp}.json`, filteredDepenses);
+                saveToFile(`vehicules_${timestamp}.json`, vehicules);
+                
+                return {
+                    success: true,
+                    recettes: filteredRecettes.length,
+                    depenses: filteredDepenses.length,
+                    vehicules: vehicules.length
+                };
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // Exécuter la sauvegarde automatiquement au chargement
+        window.onload = function() {
+            const result = backupAllData();
+            const statusDiv = document.getElementById('status');
+            
+            if (result.success) {
+                statusDiv.innerHTML = `
+                    <h2>Sauvegarde effectuée avec succès !</h2>
+                    <p>Fichiers téléchargés :</p>
+                    <ul>
+                        <li>recettes_*.json (${result.recettes} entrées)</li>
+                        <li>depenses_*.json (${result.depenses} entrées)</li>
+                        <li>vehicules_*.json (${result.vehicules} entrées)</li>
+                    </ul>
+                    <p>Vous pouvez maintenant fermer cet onglet.</p>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <h2>Erreur lors de la sauvegarde</h2>
+                    <p>${result.error || 'Une erreur inconnue est survenue'}</p>
+                    <p>Veuillez vous assurer d'être connecté à l'application ML Transport.</p>
+                `;
+            }
+        };
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        #status {
+            margin-top: 50px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet"></head>
+<body>
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+    <h1>Sauvegarde automatique des données</h1>
+    <div id="status">
+        <p>Sauvegarde en cours, veuillez patienter...</p>
+    </div>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

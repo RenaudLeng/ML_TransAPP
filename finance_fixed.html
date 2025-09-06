@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Flatpickr pour les sélecteurs de date -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- FileSaver for Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- CSS -->
+  <link href="./css/navbar.css" rel="stylesheet">
+  <link href="./css/buttons.css?v=1.1" rel="stylesheet">
+  <link href="./css/notifications.css" rel="stylesheet">
+  
+  <style>
+    /* Styles CSS existants */
+    :root {
+      --card-border-radius: 12px;
+      --card-padding: 1.25rem;
+      --transition-speed: 0.3s;
+    }
+    
+    .summary-card {
+      border-radius: var(--card-border-radius);
+      padding: var(--card-padding);
+      transition: all var(--transition-speed) ease;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Autres styles... */
+  </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet"></head>
+<body>
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <!-- Votre contenu HTML existant ici -->
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+  
+  <script>
+    // Constantes
+    const DAILY_TARGET = 35000;
+    const HOLIDAY_TARGET = 30000;
+    const DEADLINE_HOUR = 22; // 22h pour la deadline
+    const DEADLINE_MINUTE = 55; // 55 minutes
+    
+    // État global de l'application
+    const appState = {
+      data: {
+        recettes: [],
+        depenses: [],
+        vehicules: [],
+        currentUser: null
+      },
+      ui: {
+        currentModal: null,
+        activeTab: 'recettes'
+      }
+    };
+    
+    /**
+     * Récupère la liste des bus disponibles
+     * @returns {Promise<Array>} Liste des bus
+     */
+    async function getAvailableBuses() {
+      try {
+        // Récupérer les véhicules depuis l'état de l'application
+        if (appState.data.vehicules && appState.data.vehicules.length > 0) {
+          return appState.data.vehicules.map(vehicule => ({
+            id: vehicule.id,
+            nom: vehicule.nom || `Bus ${vehicule.id}`,
+            immatriculation: vehicule.immatriculation
+          }));
+        }
+        
+        // Si pas de véhicules dans l'état, essayer de les charger
+        const response = await fetch('/api/vehicules');
+        if (response.ok) {
+          const data = await response.json();
+          return data.map(vehicule => ({
+            id: vehicule.id,
+            nom: vehicule.nom || `Bus ${vehicule.id}`,
+            immatriculation: vehicule.immatriculation
+          }));
+        }
+        
+        // Retourner une valeur par défaut si l'API échoue
+        return [
+          { id: 'bus1', nom: 'Bus 1' },
+          { id: 'bus2', nom: 'Bus 2' },
+          { id: 'bus3', nom: 'Bus 3' }
+        ];
+      } catch (error) {
+        console.error('Erreur lors de la récupération des bus:', error);
+        return [];
+      }
+    }
+
+    // Initialisation principale de l'application
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        console.log('Initialisation de l\'application...');
+        
+        // Vérifier si l'application est déjà initialisée
+        if (window.appInitialized) {
+          console.log('L\'application est déjà initialisée');
+          return;
+        }
+        
+        // Initialiser les composants
+        await initializeAppComponents();
+        
+        // Initialiser les écouteurs d'événements
+        initEventListeners();
+        
+        // Initialiser le calendrier des coches
+        const calendarBusSelect = document.getElementById('busCalendarSelect');
+        if (calendarBusSelect) {
+          // Remplir le sélecteur de bus
+          const buses = await getAvailableBuses();
+          buses.forEach(bus => {
+            const option = document.createElement('option');
+            option.value = bus.id;
+            option.textContent = bus.nom || `Bus ${bus.id}`;
+            calendarBusSelect.appendChild(option);
+          });
+          
+          // Ajouter l'écouteur d'événement pour le changement de bus
+          calendarBusSelect.addEventListener('change', function() {
+            selectedBus = this.value;
+            generateCalendar();
+          });
+          
+          // Initialiser le sélecteur de mois
+          const monthSelect = document.getElementById('monthSelect');
+          if (monthSelect) {
+            monthSelect.addEventListener('change', function() {
+              const [year, month] = this.value.split('-').map(Number);
+              currentDate = new Date(year, month - 1, 1);
+              generateCalendar();
+            });
+          }
+          
+          // Générer le calendrier initial
+          generateCalendar();
+        }
+        
+        // Marquer l'application comme initialisée
+        window.appInitialized = true;
+        console.log('Application initialisée avec succès');
+        
+        // Charger les données initiales
+        await loadInitialData();
+        
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de l\'application:', error);
+        showNotification('Une erreur est survenue lors du chargement de l\'application', 'error');
+      }
+    });
+    
+    /**
+     * Initialise les composants de l'application
+     */
+    async function initializeAppComponents() {
+      try {
+        console.log('Initialisation des composants...');
+        
+        // Initialiser les sélecteurs de date
+        initDatePickers();
+        
+        // Initialiser les menus déroulants
+        initializeDropdowns();
+        
+        // Initialiser les onglets
+        updateActiveTab('recettes');
+        
+        // Charger les données initiales
+        await loadInitialData();
+        
+        console.log('Composants initialisés avec succès');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des composants:', error);
+        throw error;
+      }
+    }
+    
+    /**
+     * Charge les données initiales de l'application
+     */
+    async function loadInitialData() {
+      try {
+        // Charger les données depuis le localStorage ou une API
+        const savedData = localStorage.getItem('financeData');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          Object.assign(appState.data, parsedData);
+        }
+        
+        // Mettre à jour l'interface utilisateur
+        updateUI();
+        
+      } catch (error) {
+        console.error('Erreur lors du chargement des données initiales:', error);
+        throw error;
+      }
+    }
+    
+    /**
+     * Initialise les composants de l'application
+     */
+    async function initializeAppComponents() {
+      try {
+        console.log('Initialisation des composants de l\'application...');
+        
+        // Initialiser les sélecteurs de date
+        initDatePickers();
+        
+        // Initialiser les menus déroulants
+        initializeDropdowns();
+        
+        // Initialiser les filtres
+        await populateBusFilter();
+        
+        console.log('Composants de l\'application initialisés avec succès');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des composants:', error);
+        throw error;
+      }
+    }
+    
+    /**
+     * Initialise les écouteurs d'événements
+     */
+    function initEventListeners() {
+      try {
+        console.log('Initialisation des écouteurs d\'événements...');
+        
+        // Filtre de bus
+        const filterBus = document.getElementById('filterBus');
+        if (filterBus) {
+          // Supprimer les écouteurs existants pour éviter les doublons
+          const newFilterBus = filterBus.cloneNode(true);
+          filterBus.parentNode.replaceChild(newFilterBus, filterBus);
+          
+          // Ajouter le nouvel écouteur
+          newFilterBus.addEventListener('change', () => {
+            const searchValue = document.getElementById('searchRecette')?.value || '';
+            afficherRecettes(searchValue);
+          });
+        }
+        
+        // Gestion du type de dépense
+        const typeDepense = document.getElementById('typeDepense');
+        if (typeDepense) {
+          const busField = document.getElementById('busFieldDepense');
+          typeDepense.addEventListener('change', function() {
+            if (busField) {
+              if (this.value === 'bus') {
+                busField.classList.remove('d-none');
+              } else {
+                busField.classList.add('d-none');
+              }
+            }
+          });
+        }
+        
+        // Champ de recherche
+        const searchRecette = document.getElementById('searchRecette');
+        if (searchRecette) {
+          // Supprimer les écouteurs existants pour éviter les doublons
+          const newSearchRecette = searchRecette.cloneNode(true);
+          searchRecette.parentNode.replaceChild(newSearchRecette, searchRecette);
+          
+          // Ajouter le nouvel écouteur avec un délai pour éviter les appels trop fréquents
+          let searchTimeout;
+          newSearchRecette.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              afficherRecettes(e.target.value);
+            }, 300); // Délai de 300ms
+          });
+        }
+        
+        console.log('Écouteurs d\'événements initialisés avec succès');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des écouteurs d\'événements:', error);
+        throw error;
+      }
+    }
+    
+    /**
+     * Met à jour l'interface utilisateur en fonction de l'état de l'application
+     */
+    function updateUI() {
+      // Mettre à jour les tableaux de données
+      afficherRecettes();
+      afficherDepenses();
+      
+      // Mettre à jour les totaux
+      mettreAJourTotaux();
+      
+      // Mettre à jour les graphiques si nécessaire
+      updateChartsIfExists();
+    }
+    
+    /**
+     * Initialise les sélecteurs de date avec Flatpickr
+     */
+    function initDatePickers() {
+      try {
+        // Initialiser les sélecteurs de date avec Flatpickr
+        const dateInputs = document.querySelectorAll('.date-picker');
+        dateInputs.forEach(input => {
+          flatpickr(input, {
+            locale: 'fr',
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            clickOpens: true,
+            disableMobile: true
+          });
+        });
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des sélecteurs de date:', error);
+      }
+    }
+    
+    /**
+     * Initialise les menus déroulants
+     */
+    function initializeDropdowns() {
+      try {
+        // Initialiser les menus déroulants Bootstrap
+        const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+        const dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+          return new bootstrap.Dropdown(dropdownToggleEl);
+        });
+        console.log(`Initialisation de ${dropdownList.length} menus déroulants`);
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des menus déroulants:', error);
+      }
+    }
+    
+    /**
+     * Met à jour l'onglet actif
+     */
+    function updateActiveTab(tabId) {
+      try {
+        // Supprimer la classe active de tous les onglets
+        document.querySelectorAll('.nav-link').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Ajouter la classe active à l'onglet sélectionné
+        const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+        if (activeTab) {
+          activeTab.classList.add('active');
+        }
+        
+        // Mettre à jour l'état de l'application
+        appState.ui.activeTab = tabId;
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour de l\'onglet actif:', error);
+      }
+    }
+    
+    /**
+     * Affiche les recettes filtrées
+     */
+    function afficherRecettes(filter = '') {
+      try {
+        const recettes = appState.data.recettes || [];
+        const filterBus = document.getElementById('filterBus')?.value || '';
+        
+        // Filtrer les recettes
+        const filteredRecettes = recettes.filter(recette => {
+          const matchesSearch = !filter || 
+            (recette.description && recette.description.toLowerCase().includes(filter.toLowerCase())) ||
+            (recette.montant && recette.montant.toString().includes(filter));
+            
+          const matchesBus = !filterBus || (recette.bus && recette.bus === filterBus);
+          
+          return matchesSearch && matchesBus;
+        });
+        
+        // Mettre à jour l'affichage
+        const tbody = document.querySelector('#recetteTable tbody');
+        if (tbody) {
+          tbody.innerHTML = filteredRecettes.map(recette => `
+            <tr>
+              <td>${recette.date || ''}</td>
+              <td>${recette.bus || ''}</td>
+              <td class="text-end">${recette.montant ? recette.montant.toFixed(2) + ' €' : ''}</td>
+              <td>${recette.type || ''}</td>
+              <td>${recette.commentaire || ''}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary" onclick="openEditRecetteModal('${recette.id}')">
+                  <i class="ph ph-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="supprimerRecette('${recette.id}')">
+                  <i class="ph ph-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'affichage des recettes:', error);
+        showNotification('Une erreur est survenue lors du chargement des recettes', 'error');
+      }
+    }
+    
+    /**
+     * Affiche les dépenses
+     */
+    function afficherDepenses() {
+      try {
+        const depenses = appState.data.depenses || [];
+        const tbody = document.querySelector('#depenseTable tbody');
+        
+        if (tbody) {
+          tbody.innerHTML = depenses.map(depense => `
+            <tr>
+              <td>${depense.date || ''}</td>
+              <td>${depense.type || ''}</td>
+              <td>${depense.bus || '-'}</td>
+              <td class="text-end">${depense.montant ? depense.montant.toFixed(2) + ' €' : ''}</td>
+              <td>${depense.commentaire || ''}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary" onclick="openEditDepenseModal('${depense.id}')">
+                  <i class="ph ph-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="supprimerDepense('${depense.id}')">
+                  <i class="ph ph-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'affichage des dépenses:', error);
+        showNotification('Une erreur est survenue lors du chargement des dépenses', 'error');
+      }
+    }
+    
+    /**
+     * Met à jour les totaux
+     */
+    function mettreAJourTotaux() {
+      try {
+        const recettes = appState.data.recettes || [];
+        const depenses = appState.data.depenses || [];
+        
+        // Calculer les totaux
+        const totalRecettes = recettes.reduce((sum, r) => sum + (parseFloat(r.montant) || 0), 0);
+        const totalDepenses = depenses.reduce((sum, d) => sum + (parseFloat(d.montant) || 0), 0);
+        const solde = totalRecettes - totalDepenses;
+        
+        // Mettre à jour l'interface
+        document.getElementById('totalRecettes').textContent = totalRecettes.toFixed(2) + ' €';
+        document.getElementById('totalDepenses').textContent = totalDepenses.toFixed(2) + ' €';
+        document.getElementById('solde').textContent = solde.toFixed(2) + ' €';
+        
+        // Mettre en forme le solde (vert si positif, rouge si négatif)
+        const soldeElement = document.getElementById('solde');
+        if (soldeElement) {
+          soldeElement.className = solde >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold';
+        }
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour des totaux:', error);
+      }
+    }
+    
+    /**
+     * Met à jour les graphiques s'ils existent
+     */
+    function updateChartsIfExists() {
+      // Implémentation simplifiée - à compléter avec la logique réelle des graphiques
+      console.log('Mise à jour des graphiques...');
+    }
+    
+    // Fonctions pour le calendrier des coches
+    let currentDate = new Date();
+    let selectedBus = 'all';
+
+    /**
+     * Génère le calendrier des coches
+     */
+    function generateCalendar() {
+      try {
+        const calendarContainer = document.getElementById('calendarContainer');
+        if (!calendarContainer) return;
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        // Mettre à jour le sélecteur de mois
+        const monthSelect = document.getElementById('monthSelect');
+        if (monthSelect) {
+          monthSelect.value = `${year}-${String(month + 1).padStart(2, '0')}`;
+        }
+
+        // Obtenir le premier et le dernier jour du mois
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        // Créer le tableau du calendrier
+        let calendarHTML = `
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Lun</th><th>Mar</th><th>Mer</th><th>Jeu</th>
+                <th>Ven</th><th>Sam</th><th>Dim</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        // Ajouter les jours vides au début du mois
+        let dayOfWeek = firstDay.getDay();
+        dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Ajuster pour commencer le lundi
+        
+        let date = 1;
+        let isFirstRow = true;
+        
+        while (date <= lastDay.getDate()) {
+          calendarHTML += '<tr>';
+          
+          // Pour la première ligne, ajouter des cellules vides si nécessaire
+          if (isFirstRow) {
+            for (let i = 0; i < dayOfWeek; i++) {
+              calendarHTML += '<td></td>';
+            }
+            isFirstRow = false;
+          }
+          
+          // Ajouter les jours du mois
+          for (let i = dayOfWeek; i < 7 && date <= lastDay.getDate(); i++) {
+            const currentDate = new Date(year, month, date);
+            const dateStr = formatDateForDisplay(currentDate);
+            const status = getDayReceiptStatus(dateStr, selectedBus);
+            const tooltip = getDayTooltip(dateStr, status, selectedBus);
+            
+            calendarHTML += `
+              <td class="text-center ${getStatusClass(status)}" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="${tooltip}">
+                ${date}
+              </td>
+            `;
+            
+            date++;
+            dayOfWeek++;
+          }
+          
+          // Si le mois ne se termine pas un dimanche, ajouter des cellules vides
+          if (dayOfWeek < 7 && date > lastDay.getDate()) {
+            for (let i = dayOfWeek; i < 7; i++) {
+              calendarHTML += '<td></td>';
+            }
+          }
+          
+          calendarHTML += '</tr>';
+          dayOfWeek = 0; // Réinitialiser pour les lignes suivantes
+        }
+        
+        calendarHTML += '</tbody></table>';
+        calendarContainer.innerHTML = calendarHTML;
+        
+        // Initialiser les tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+      } catch (error) {
+        console.error('Erreur lors de la génération du calendrier:', error);
+        showNotification('Une erreur est survenue lors de la génération du calendrier', 'error');
+      }
+    }
+
+    /**
+     * Change le mois affiché dans le calendrier
+     * @param {number} offset - Nombre de mois à ajouter/soustraire
+     */
+    function navigateMonth(offset) {
+      currentDate.setMonth(currentDate.getMonth() + offset);
+      generateCalendar();
+    }
+
+    /**
+     * Formate une date au format JJ/MM/AAAA
+     * @param {Date} date - Date à formater
+     * @returns {string} Date formatée
+     */
+    function formatDateForDisplay(date) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    /**
+     * Obtient la classe CSS en fonction du statut
+     * @param {string} status - Statut du jour
+     * @returns {string} Classe CSS
+     */
+    function getStatusClass(status) {
+      const statusClasses = {
+        'complete': 'table-success',
+        'partial': 'table-warning',
+        'missing': 'table-danger',
+        'na': 'table-dark' // Changé de table-secondary à table-dark pour le noir
+      };
+      return statusClasses[status] || '';
+    }
+
+    /**
+     * Obtient le statut des recettes pour un jour donné
+     * @param {string} dateStr - Date au format JJ/MM/AAAA
+     * @param {string} busId - ID du bus (ou 'all' pour tous)
+     * @returns {string} Statut du jour ('complete', 'partial', 'missing', 'na')
+     */
+    function getDayReceiptStatus(dateStr, busId = 'all') {
+      try {
+        // Récupérer les recettes pour la date donnée
+        const recettes = (appState.data.recettes || []).filter(recette => {
+          const matchesDate = recette.date === dateStr;
+          const matchesBus = busId === 'all' || recette.busId === busId;
+          return matchesDate && matchesBus;
+        });
+
+        if (recettes.length === 0) {
+          // Vérifier si c'est un jour de semaine (lundi à vendredi)
+          const date = parseDate(dateStr);
+          const dayOfWeek = date.getDay();
+          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+          
+          // Si c'est un jour de semaine et qu'il n'y a pas de recettes, c'est manquant
+          return isWeekend ? 'na' : 'missing';
+        }
+
+        // Vérifier si toutes les recettes attendues sont présentes
+        // (à adapter selon votre logique métier)
+        const expectedRecettes = 1; // À ajuster selon votre logique
+        
+        if (recettes.length >= expectedRecettes) {
+          return 'complete';
+        } else if (recettes.length > 0) {
+          return 'partial';
+        }
+        
+        return 'missing';
+      } catch (error) {
+        console.error('Erreur lors de la récupération du statut du jour:', error);
+        return 'na';
+      }
+    }
+
+    /**
+     * Génère un texte d'infobulle pour un jour du calendrier
+     * @param {string} dateStr - Date au format JJ/MM/AAAA
+     * @param {string} status - Statut du jour
+     * @param {string} busId - ID du bus (ou 'all' pour tous)
+     * @returns {string} Texte de l'infobulle
+     */
+    function getDayTooltip(dateStr, status, busId = 'all') {
+      const statusTexts = {
+        'complete': 'Complet',
+        'partial': 'Partiel',
+        'missing': 'Manquant',
+        'na': 'Non applicable'
+      };
+      
+      const statusText = statusTexts[status] || 'Inconnu';
+      const busText = busId === 'all' ? 'Tous les bus' : `Bus ${busId}`;
+      
+      return `
+        <div class="text-start">
+          <strong>${dateStr}</strong><br>
+          <span>${busText}</span><br>
+          <span>Statut: ${statusText}</span>
+        </div>
+      `;
+    }
+
+    /**
+     * Convertit une chaîne de date JJ/MM/AAAA en objet Date
+     * @param {string} dateStr - Date au format JJ/MM/AAAA
+     * @returns {Date} Objet Date
+     */
+    function parseDate(dateStr) {
+      const [day, month, year] = dateStr.split('/').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    /**
+     * Affiche une notification à l'utilisateur
+     * @param {string} message - Le message à afficher
+     * @param {string} type - Le type de notification ('success', 'error', 'warning', 'info')
+     * @param {number} [duration=5000] - Durée d'affichage en millisecondes
+     */
+    function showNotification(message, type = 'info', duration = 5000) {
+      try {
+        // Créer l'élément de notification
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+          <div class="notification-content">
+            <i class="ph ph-${type === 'error' ? 'warning' : type === 'success' ? 'check-circle' : type === 'warning' ? 'warning' : 'info'}"></i>
+            <span>${message}</span>
+          </div>
+          <button class="notification-close">&times;</button>
+        `;
+        
+        // Ajouter la notification au conteneur
+        const container = document.getElementById('notifications-container') || createNotificationContainer();
+        container.appendChild(notification);
+        
+        // Fermer la notification après la durée spécifiée
+        const timer = setTimeout(() => {
+          notification.classList.add('fade-out');
+          setTimeout(() => notification.remove(), 300);
+        }, duration);
+        
+        // Gérer la fermeture manuelle
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.addEventListener('click', () => {
+          clearTimeout(timer);
+          notification.classList.add('fade-out');
+          setTimeout(() => notification.remove(), 300);
+        });
+        
+        // Supprimer la notification après l'animation
+        notification.addEventListener('animationend', (e) => {
+          if (e.animationName === 'fadeOut') {
+            notification.remove();
+          }
+        });
+        
+      } catch (error) {
+        console.error('Erreur lors de l\'affichage de la notification:', error);
+        // Fallback simple en cas d'erreur
+        alert(`${type.toUpperCase()}: ${message}`);
+      }
+    }
+    
+    /**
+     * Crée un conteneur pour les notifications s'il n'existe pas
+     * @returns {HTMLElement} Le conteneur de notifications
+     */
+    function createNotificationContainer() {
+      const container = document.createElement('div');
+      container.id = 'notifications-container';
+      document.body.appendChild(container);
+      return container;
+    }
+    
+    // Exporter les fonctions nécessaires dans la portée globale
+    window.updateActiveTab = updateActiveTab;
+    window.afficherRecettes = afficherRecettes;
+    window.afficherDepenses = afficherDepenses;
+    window.mettreAJourTotaux = mettreAJourTotaux;
+    window.generateCalendar = generateCalendar;
+    window.navigateMonth = navigateMonth;
+    window.getDayReceiptStatus = getDayReceiptStatus;
+    window.getDayTooltip = getDayTooltip;
+    window.showNotification = showNotification;
+    
+  </script>
+  
+  <!-- Inclure les autres scripts nécessaires -->
+  <script src="public/js/modules/include-navbar.js"></script>
+  <script src="public/js/modules/historique.js"></script>
+  
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

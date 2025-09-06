@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres | ML TRANSPORT</title>
+  <link href="/css/components/navbar.css" rel="stylesheet">
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="description" content="Application de gestion pour ML Transport">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="ML Transport">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <!-- PWA Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <!-- Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Barre de navigation -->
+  <link href="public/css/components/navbar.css" rel="stylesheet">
+  <script src="https://unpkg.com/phosphor-icons"></script>
+  <style>
+    body {
+      background: #f8f9fa;
+      padding-top: 70px;
+      padding-bottom: 100px;
+    }
+    .card {
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-header {
+      background: #0d6efd;
+      color: white;
+      font-weight: 600;
+    }
+    .required-field::after {
+      content: " *";
+      color: red;
+    }
+    .footer {
+      background: #343a40;
+      color: white;
+      padding: 15px 0;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .action-buttons {
+      background: white;
+      padding: 15px;
+      border-top: 1px solid #eee;
+      position: sticky;
+      bottom: 60px;
+      z-index: 10;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    #saveBtn {
+      transition: all 0.2s ease;
+    }
+    #saveBtn:hover {
+      transform: translateY(-2px);
+    }
+    .password-toggle {
+      cursor: pointer;
+    }
+    .hamburger {
+      border: none;
+      background: none;
+      color: white;
+      font-size: 1.5rem;
+    }
+    .offcanvas {
+      background-color: #f8f9fa;
+    }
+    .form-section {
+      margin-bottom: 30px;
+    }
+    .example-text {
+      font-size: 0.8rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+    .reset-password-link {
+      cursor: pointer;
+      color: #0d6efd;
+      text-decoration: underline;
+    }
+    .backup-history-item {
+      transition: all 0.2s;
+    }
+    .backup-history-item:hover {
+      background-color: #f8f9fa;
+    }
+    #backupHistoryList {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .app-logo {
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+      object-fit: contain;
+    }
+  </style>
+
+  <link href="/css/pages/style.css" rel="stylesheet">
+  <link href="/css/components/notifications.css" rel="stylesheet">
+  <link href="/css/components/buttons.css" rel="stylesheet"></head>
+<body class="light-mode">
+  <!-- Conteneur pour la barre de navigation -->
+  <div id="navbar-container">
+    <!-- La barre de navigation sera chargée ici de manière asynchrone -->
+  </div>
+  
+  <!-- Marge pour le contenu sous la barre de navigation fixe -->
+  <div style="height: 72px;"></div>
+
+  <!-- Barre de navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">
+      <span class="logo-mlapp">ML</span>
+      <span>Transport</span>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <i class="ph ph-house"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="bus.html">
+            <i class="ph ph-bus"></i> Bus
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="finance.html">
+            <i class="ph ph-currency-dollar"></i> Finance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chauffeurs.html">
+            <i class="ph ph-users"></i> Chauffeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="statistiques.html">
+            <i class="ph ph-chart-bar"></i> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="maintenance.html">
+            <i class="ph ph-wrench"></i> Maintenance
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="ph ph-user-circle fs-4 me-2"></i>
+            <span id="username">Admin</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+        <li class="nav-item ms-2">
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  <main class="container mt-5 pt-5">
+
+  <!-- Menu Hamburger pour mobile -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title"><i class="ph ph-bus"></i> ML TRANSPORT</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html"><i class="ph ph-house"></i> Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="parametres.html"><i class="ph ph-gear"></i> Paramètres</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="profil.html"><i class="ph ph-user"></i> Profil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="mobileLogoutBtn"><i class="ph ph-sign-out"></i> Déconnexion</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <h2 class="mb-4"><i class="ph ph-gear"></i> Paramètres de l'application</h2>
+
+    <!-- Section Informations Entreprise -->
+    <div class="card">
+      <div class="card-header">
+        <i class="ph ph-buildings"></i> Informations entreprise
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label required-field">Nom de l'entreprise</label>
+              <input type="text" class="form-control" id="companyName" required placeholder="Ex: ML Transport SARL">
+              <div class="example-text">Ex: ML Transport SARL</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Slogan</label>
+              <input type="text" class="form-control" id="slogan" placeholder="Ex: Votre partenaire de confiance">
+              <div class="example-text">Ex: Votre partenaire de confiance</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Numéro de téléphone</label>
+              <input type="tel" class="form-control" id="phone" required placeholder="Ex: +241 01 23 45 67">
+              <div class="example-text">Ex: +241 01 23 45 67</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Adresse email</label>
+              <input type="email" class="form-control" id="email" placeholder="Ex: contact@mltransport.ga">
+              <div class="example-text">Ex: contact@mltransport.ga</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Site web</label>
+              <input type="url" class="form-control" id="website" placeholder="Ex: https://www.mltransport.ga">
+              <div class="example-text">Ex: https://www.mltransport.ga</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Logo</label>
+              <input type="file" class="form-control" id="logo" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label required-field">Adresse</label>
+          <input type="text" class="form-control" id="address" required placeholder="Ex: Rue de la Paix, Quartier Louis">
+          <div class="example-text">Ex: Rue de la Paix, Quartier Louis</div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label required-field">Ville</label>
+              <input type="text" class="form-control" id="city" required placeholder="Ex: Libreville">
+              <div class="example-text">Ex: Libreville</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label required-field">Code postal</label>
+              <input type="text" class="form-control" id="postalCode" required placeholder="Ex: BP 1234">
+              <div class="example-text">Ex: BP 1234</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label required-field">Pays</label>
+              <select class="form-select" id="country" required>
+                <option value="">Sélectionnez...</option>
+                <option value="FR">France</option>
+                <option value="BE">Belgique</option>
+                <option value="CH">Suisse</option>
+                <option value="CA">Canada</option>
+                <option value="GA" selected>Gabon</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description de l'entreprise</label>
+          <textarea class="form-control" id="description" rows="3" placeholder="Décrivez votre entreprise en quelques mots..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Compte Administrateur -->
+    <div class="card">
+      <div class="card-header">
+        <i class="ph ph-user-circle"></i> Compte administrateur
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label required-field">Nom complet</label>
+              <input type="text" class="form-control" id="adminFullName" required placeholder="Ex: DJEMBOU Bertrand">
+              <div class="example-text">Ex: AYOUMA Prince</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Nom d'utilisateur</label>
+              <input type="text" class="form-control" id="adminUsername" required placeholder="Ex: admin.mltransport">
+              <div class="example-text">Ex: admin.mltransport</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Adresse email</label>
+              <input type="email" class="form-control" id="adminEmail" placeholder="Ex: admin@mltransport.ga">
+              <div class="example-text">Ex: admin@mltransport.ga</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Numéro de téléphone</label>
+              <input type="tel" class="form-control" id="adminPhone" required placeholder="Ex: +241 07 89 01 23">
+              <div class="example-text">Ex: +241 07 89 01 23</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label required-field">Mot de passe</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="adminPassword" required minlength="8" placeholder="••••••••">
+                <span class="input-group-text password-toggle">
+                  <i class="ph ph-eye"></i>
+                </span>
+              </div>
+              <div class="form-text">Minimum 8 caractères</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label required-field">Confirmer mot de passe</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="confirmPassword" required placeholder="••••••••">
+                <span class="input-group-text password-toggle">
+                  <i class="ph ph-eye"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Gestion des Profils et Rôles -->
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <i class="ph ph-users"></i> Gestion des Profils et Rôles
+      </div>
+      <div class="card-body">
+        <!-- Liste des profils -->
+        <div class="row mb-4">
+          <div class="col-md-12 mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5>Profils utilisateurs</h5>
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="ph ph-plus"></i> Nouveau profil
+              </button>
+            </div>
+            <div class="table-responsive mt-3">
+              <table class="table table-hover" id="usersTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Nom complet</th>
+                    <th scope="col">Nom d'utilisateur</th>
+                    <th scope="col">Rôle</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersList">
+                  <!-- Les utilisateurs seront listés ici dynamiquement -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gestion des rôles -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5>Rôles et permissions</h5>
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                <i class="ph ph-plus"></i> Nouveau rôle
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover" id="rolesTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Rôle</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Permissions</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rolesList">
+                  <!-- Les rôles seront listés ici dynamiquement -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ajout/Modification Utilisateur -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userModalTitle">Nouveau profil utilisateur</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <form id="userForm">
+              <input type="hidden" id="userId">
+              <div class="mb-3">
+                <label class="form-label required-field">Nom complet</label>
+                <input type="text" class="form-control" id="userFullName" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required-field">Nom d'utilisateur</label>
+                <input type="text" class="form-control" id="userUsername" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="userEmail">
+              </div>
+              <div class="mb-3">
+                <label class="form-label required-field">Mot de passe</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="userPassword" required minlength="8">
+                  <span class="input-group-text password-toggle">
+                    <i class="ph ph-eye"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required-field">Rôle</label>
+                <select class="form-select" id="userRole" required>
+                  <!-- Les rôles seront chargés dynamiquement -->
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required-field">Statut</label>
+                <select class="form-select" id="userStatus" required>
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+              <button type="submit" style="display: none;">Submit</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" id="saveUserBtn">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ajout/Modification Rôle -->
+    <div class="modal fade" id="addRoleModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="roleModalTitle">Nouveau rôle</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <form id="roleForm">
+              <input type="hidden" id="roleId">
+              <div class="mb-3">
+                <label class="form-label required-field">Nom du rôle</label>
+                <input type="text" class="form-control" id="roleName" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" id="roleDescription" rows="3"></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required-field">Permissions</label>
+                <div class="permissions-list">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="view_dashboard" id="perm_dashboard">
+                    <label class="form-check-label" for="perm_dashboard">
+                      Accès au tableau de bord
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="manage_users" id="perm_users">
+                    <label class="form-check-label" for="perm_users">
+                      Gestion des utilisateurs
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="manage_settings" id="perm_settings">
+                    <label class="form-check-label" for="perm_settings">
+                      Gestion des paramètres
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="view_reports" id="perm_reports">
+                    <label class="form-check-label" for="perm_reports">
+                      Accès aux rapports
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="manage_backups" id="perm_backups">
+                    <label class="form-check-label" for="perm_backups">
+                      Gestion des sauvegardes
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" style="display: none;">Submit</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" id="saveRoleBtn">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Sauvegarde et Restauration -->
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <i class="ph ph-cloud-arrow-up"></i> Sauvegarde et Restauration
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h5>Sauvegarde automatique</h5>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="backupFrequency" id="backupDaily" value="daily">
+              <label class="form-check-label" for="backupDaily">
+                Quotidienne
+              </label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="backupFrequency" id="backupWeekly" value="weekly" checked>
+              <label class="form-check-label" for="backupWeekly">
+                Hebdomadaire
+              </label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="backupFrequency" id="backupMonthly" value="monthly">
+              <label class="form-check-label" for="backupMonthly">
+                Mensuelle
+              </label>
+            </div>
+            <button type="button" class="btn btn-info mt-3" id="backupNowBtn">
+              <i class="ph ph-cloud-arrow-up"></i> Sauvegarder maintenant
+            </button>
+          </div>
+          <div class="col-md-6">
+            <h5>Historique des sauvegardes</h5>
+            <div class="list-group" id="backupHistoryList">
+              <!-- Les sauvegardes seront listées ici dynamiquement -->
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <h5>Restauration</h5>
+            <div class="mb-3">
+              <label for="backupFile" class="form-label">Importer une sauvegarde</label>
+              <input type="file" class="form-control" id="backupFile" accept=".json">
+              <div class="form-text">Sélectionnez un fichier de sauvegarde .json</div>
+            </div>
+            <button type="button" class="btn btn-warning" id="restoreBtn" disabled>
+              <i class="ph ph-cloud-arrow-down"></i> Restaurer les données
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Réinitialisation des données -->
+    <div class="card">
+      <div class="card-header bg-danger text-white">
+        <i class="ph ph-warning"></i> Réinitialisation des données
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning">
+          <i class="ph ph-warning-circle"></i> Attention : Cette action est irréversible et supprimera toutes les données de l'application.
+        </div>
+        <p>La réinitialisation effacera :</p>
+        <ul>
+          <li>Les paramètres de l'entreprise</li>
+          <li>Les informations du compte administrateur</li>
+          <li>Les données de connexion</li>
+          <li>Toutes les autres données stockées localement</li>
+        </ul>
+        <button id="resetDataBtn" type="button" class="btn btn-danger">
+          <i class="ph ph-trash"></i> Réinitialiser toutes les données
+        </button>
+      </div>
+    </div>
+
+    <!-- Zone des boutons d'action -->
+    <div class="action-buttons rounded">
+      <div class="d-flex justify-content-between">
+        <button id="cancelBtn" type="button" class="btn btn-outline-secondary">
+          <i class="ph ph-x"></i> Annuler
+        </button>
+        <button id="saveBtn" type="button" class="btn btn-primary">
+          <i class="ph ph-floppy-disk"></i> Enregistrer les paramètres
+        </button>
+      </div>
+    </div>
+
+    <div id="alertContainer" class="mt-3"></div>
+    
+    <!-- Section Historique des Activités -->
+    <div class="card mt-4">
+      <div class="card-header bg-primary text-white">
+        <i class="ph ph-clock-counter-clockwise"></i> Historique des Activités
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <select id="filterType" class="form-select">
+              <option value="">Tous les types</option>
+              <option value="creation">Création</option>
+              <option value="modification">Modification</option>
+              <option value="suppression">Suppression</option>
+              <option value="validation">Validation</option>
+              <option value="annulation">Annulation</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select id="filterEntity" class="form-select">
+              <option value="">Toutes les entités</option>
+              <option value="recette">Recettes</option>
+              <option value="depense">Dépenses</option>
+              <option value="utilisateur">Utilisateurs</option>
+              <option value="bus">Bus</option>
+              <option value="chauffeur">Chauffeurs</option>
+              <option value="categorie">Catégories</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher dans les détails...">
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex">
+              <button id="exportBtn" class="btn btn-outline-primary me-2" title="Exporter l'historique">
+                <i class="ph ph-export"></i>
+              </button>
+              <button id="clearHistoryBtn" class="btn btn-outline-danger" title="Effacer l'historique">
+                <i class="ph ph-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-hover" id="historyTable">
+            <thead class="table-light">
+              <tr>
+                <th>Date/Heure</th>
+                <th>Type</th>
+                <th>Entité</th>
+                <th>Utilisateur</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div id="paginationInfo" class="text-muted small">Chargement...</div>
+          <div class="btn-group">
+            <button id="prevPage" class="btn btn-sm btn-outline-secondary" disabled>
+              <i class="ph ph-caret-left"></i> Précédent
+            </button>
+            <button id="nextPage" class="btn btn-sm btn-outline-secondary">
+              Suivant <i class="ph ph-caret-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <footer class="footer text-center">
+    <div class="container">
+      <span>ML TRANSPORT &copy; <span id="currentYear"></span> - Powered by Forever&gt;Inc</span>
+    </div>
+  </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>  <script src="public/js/modules/sync-manager.js"></script>  <script>
+    // Enregistrement du Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('ServiceWorker enregistré avec succès:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('Échec de l\'enregistrement du ServiceWorker:', error);
+          });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Définir l'année courante
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+      // Initialisation des données des rôles et utilisateurs
+      let usersData = JSON.parse(localStorage.getItem('users')) || [];
+      let rolesData = JSON.parse(localStorage.getItem('roles')) || [
+        {
+          id: 'admin',
+          name: 'Administrateur',
+          description: 'Accès complet à toutes les fonctionnalités',
+          permissions: ['view_dashboard', 'manage_users', 'manage_settings', 'view_reports', 'manage_backups']
+        },
+        {
+          id: 'user',
+          name: 'Utilisateur',
+          description: 'Accès limité aux fonctionnalités de base',
+          permissions: ['view_dashboard', 'view_reports']
+        }
+      ];
+
+      // Sauvegarder les rôles par défaut si non existants
+      if (!localStorage.getItem('roles')) {
+        localStorage.setItem('roles', JSON.stringify(rolesData));
+      }
+
+      // Fonction pour mettre à jour la liste des utilisateurs
+      function updateUsersList() {
+        const usersList = document.getElementById('usersList');
+        usersList.innerHTML = usersData.map(user => `
+          <tr>
+            <td>${user.fullName}</td>
+            <td>${user.username}</td>
+            <td>${rolesData.find(r => r.id === user.roleId)?.name || 'N/A'}</td>
+            <td>
+              <span class="badge ${user.status === 'active' ? 'bg-success' : 'bg-danger'}">
+                ${user.status === 'active' ? 'Actif' : 'Inactif'}
+              </span>
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-outline-primary edit-user" data-id="${user.id}">
+                <i class="ph ph-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger delete-user" data-id="${user.id}">
+                <i class="ph ph-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+        // Gestionnaires d'événements pour les boutons d'édition et suppression
+        document.querySelectorAll('.edit-user').forEach(btn => {
+          btn.addEventListener('click', () => editUser(btn.dataset.id));
+        });
+        document.querySelectorAll('.delete-user').forEach(btn => {
+          btn.addEventListener('click', () => deleteUser(btn.dataset.id));
+        });
+      }
+
+      // Fonction pour mettre à jour la liste des rôles
+      function updateRolesList() {
+        const rolesList = document.getElementById('rolesList');
+        rolesList.innerHTML = rolesData.map(role => `
+          <tr>
+            <td>${role.name}</td>
+            <td>${role.description || 'N/A'}</td>
+            <td>
+              ${role.permissions.map(p => `
+                <span class="badge bg-info me-1">${getPermissionLabel(p)}</span>
+              `).join('')}
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-outline-primary edit-role" data-id="${role.id}">
+                <i class="ph ph-pencil"></i>
+              </button>
+              ${role.id !== 'admin' ? `
+                <button type="button" class="btn btn-sm btn-outline-danger delete-role" data-id="${role.id}">
+                  <i class="ph ph-trash"></i>
+                </button>
+              ` : ''}
+            </td>
+          </tr>
+        `).join('');
+
+        // Mettre à jour la liste des rôles dans le formulaire utilisateur
+        const userRoleSelect = document.getElementById('userRole');
+        userRoleSelect.innerHTML = rolesData.map(role =>
+          `<option value="${role.id}">${role.name}</option>`
+        ).join('');
+
+        // Gestionnaires d'événements pour les boutons d'édition et suppression
+        document.querySelectorAll('.edit-role').forEach(btn => {
+          btn.addEventListener('click', () => editRole(btn.dataset.id));
+        });
+        document.querySelectorAll('.delete-role').forEach(btn => {
+          btn.addEventListener('click', () => deleteRole(btn.dataset.id));
+        });
+      }
+
+      // Fonction pour obtenir le libellé d'une permission
+      function getPermissionLabel(permission) {
+        const labels = {
+          view_dashboard: 'Tableau de bord',
+          manage_users: 'Gestion utilisateurs',
+          manage_settings: 'Paramètres',
+          view_reports: 'Rapports',
+          manage_backups: 'Sauvegardes'
+        };
+        return labels[permission] || permission;
+      }
+
+      // Gestionnaire pour l'ajout/modification d'utilisateur
+      document.getElementById('saveUserBtn').addEventListener('click', function() {
+        const userId = document.getElementById('userId').value;
+        const user = {
+          id: userId || Date.now().toString(),
+          fullName: document.getElementById('userFullName').value,
+          username: document.getElementById('username').value,
+          email: document.getElementById('userEmail').value,
+          password: document.getElementById('userPassword').value,
+          roleId: document.getElementById('userRole').value,
+          status: document.getElementById('userStatus').value
+        };
+
+        if (userId) {
+          // Modification
+          const index = usersData.findIndex(u => u.id === userId);
+          if (index !== -1) {
+            usersData[index] = { ...usersData[index], ...user };
+          }
+        } else {
+          // Ajout
+          usersData.push(user);
+        }
+
+        localStorage.setItem('users', JSON.stringify(usersData));
+        updateUsersList();
+        bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+        showAlert('Utilisateur enregistré avec succès !', 'success');
+      });
+
+      // Gestionnaire pour l'ajout/modification de rôle
+      document.getElementById('saveRoleBtn').addEventListener('click', function() {
+        const roleId = document.getElementById('roleId').value;
+        const permissions = Array.from(document.querySelectorAll('.permissions-list input:checked'))
+          .map(input => input.value);
+
+        const role = {
+          id: roleId || Date.now().toString(),
+          name: document.getElementById('roleName').value,
+          description: document.getElementById('roleDescription').value,
+          permissions: permissions
+        };
+
+        if (roleId) {
+          // Modification
+          const index = rolesData.findIndex(r => r.id === roleId);
+          if (index !== -1) {
+            rolesData[index] = { ...rolesData[index], ...role };
+          }
+        } else {
+          // Ajout
+          rolesData.push(role);
+        }
+
+        localStorage.setItem('roles', JSON.stringify(rolesData));
+        updateRolesList();
+        bootstrap.Modal.getInstance(document.getElementById('addRoleModal')).hide();
+        showAlert('Rôle enregistré avec succès !', 'success');
+      });
+
+      // Fonction d'édition d'utilisateur
+      function editUser(userId) {
+        const user = usersData.find(u => u.id === userId);
+        if (user) {
+          document.getElementById('userId').value = user.id;
+          document.getElementById('userFullName').value = user.fullName;
+          document.getElementById('username').value = user.username;
+          document.getElementById('userEmail').value = user.email || '';
+          document.getElementById('userPassword').value = user.password;
+          document.getElementById('userRole').value = user.roleId;
+          document.getElementById('userStatus').value = user.status;
+          document.getElementById('userModalTitle').textContent = 'Modifier le profil utilisateur';
+          new bootstrap.Modal(document.getElementById('addUserModal')).show();
+        }
+      }
+
+      // Fonction de suppression d'utilisateur
+      function deleteUser(userId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+          usersData = usersData.filter(u => u.id !== userId);
+          localStorage.setItem('users', JSON.stringify(usersData));
+          updateUsersList();
+          showAlert('Utilisateur supprimé avec succès !', 'success');
+        }
+      }
+
+      // Fonction d'édition de rôle
+      function editRole(roleId) {
+        const role = rolesData.find(r => r.id === roleId);
+        if (role) {
+          document.getElementById('roleId').value = role.id;
+          document.getElementById('roleName').value = role.name;
+          document.getElementById('roleDescription').value = role.description || '';
+          
+          // Réinitialiser toutes les permissions
+          document.querySelectorAll('.permissions-list input').forEach(input => {
+            input.checked = role.permissions.includes(input.value);
+          });
+          
+          document.getElementById('roleModalTitle').textContent = 'Modifier le rôle';
+          new bootstrap.Modal(document.getElementById('addRoleModal')).show();
+        }
+      }
+
+      // Fonction de suppression de rôle
+      function deleteRole(roleId) {
+        if (roleId === 'admin') {
+          showAlert('Le rôle Administrateur ne peut pas être supprimé', 'danger');
+          return;
+        }
+
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?')) {
+          // Vérifier si des utilisateurs utilisent ce rôle
+          const usersWithRole = usersData.filter(u => u.roleId === roleId);
+          if (usersWithRole.length > 0) {
+            showAlert('Ce rôle ne peut pas être supprimé car il est utilisé par des utilisateurs', 'danger');
+            return;
+          }
+
+          rolesData = rolesData.filter(r => r.id !== roleId);
+          localStorage.setItem('roles', JSON.stringify(rolesData));
+          updateRolesList();
+          showAlert('Rôle supprimé avec succès !', 'success');
+        }
+      }
+
+      // Réinitialisation des formulaires lors de l'ouverture des modals
+      document.getElementById('addUserModal').addEventListener('show.bs.modal', function(event) {
+        if (!event.relatedTarget) return; // Ne pas réinitialiser en cas d'édition
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+        document.getElementById('userModalTitle').textContent = 'Nouveau profil utilisateur';
+      });
+
+      document.getElementById('addRoleModal').addEventListener('show.bs.modal', function(event) {
+        if (!event.relatedTarget) return; // Ne pas réinitialiser en cas d'édition
+        document.getElementById('roleForm').reset();
+        document.getElementById('roleId').value = '';
+        document.getElementById('roleModalTitle').textContent = 'Nouveau rôle';
+      });
+
+      // Initialisation des listes
+      updateUsersList();
+      updateRolesList();
+
+      // Configuration des sauvegardes (désactivées par défaut)
+      let backupConfig = {
+        frequency: 'none',
+        lastBackup: null,
+        backups: []
+      };
+      
+      // Mettre à jour l'interface pour refléter que les sauvegardes automatiques sont désactivées
+      document.getElementById('backupFrequencyNone').checked = true;
+      document.getElementById('backupFrequencyDaily').disabled = true;
+      document.getElementById('backupFrequencyWeekly').disabled = true;
+      document.getElementById('backupFrequencyMonthly').disabled = true;
+
+      // Fonction pour créer une sauvegarde
+      function createBackup() {
+        const timestamp = new Date().toISOString();
+        const allData = {};
+        
+        // Récupérer toutes les données du localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          allData[key] = localStorage.getItem(key);
+        }
+
+        const backup = {
+          timestamp: timestamp,
+          data: allData
+        };
+
+        // Ajouter à l'historique des sauvegardes
+        backupConfig.backups.unshift({
+          timestamp: timestamp,
+          size: JSON.stringify(allData).length
+        });
+
+        // Garder seulement les 10 dernières sauvegardes
+        if (backupConfig.backups.length > 10) {
+          backupConfig.backups.pop();
+        }
+
+        backupConfig.lastBackup = timestamp;
+        localStorage.setItem('backupConfig', JSON.stringify(backupConfig));
+
+        // Télécharger la sauvegarde
+        const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ml-transport-backup-${timestamp.split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        updateBackupHistory();
+        return timestamp;
+      }
+
+      // Fonction pour planifier la prochaine sauvegarde (désactivée)
+      function planNextBackup() {
+        // Sauvegardes automatiques désactivées
+        return;
+
+        let nextBackup;
+        switch(backupConfig.frequency) {
+          case 'daily':
+            nextBackup = new Date(lastBackup.setDate(lastBackup.getDate() + 1));
+            break;
+          case 'weekly':
+            nextBackup = new Date(lastBackup.setDate(lastBackup.getDate() + 7));
+            break;
+          case 'monthly':
+            nextBackup = new Date(lastBackup.setMonth(lastBackup.getMonth() + 1));
+            break;
+        }
+
+        if (now >= nextBackup) {
+          createBackup();
+        }
+      }
+
+      // Mettre à jour l'historique des sauvegardes
+      function updateBackupHistory() {
+        const historyList = document.getElementById('backupHistoryList');
+        historyList.innerHTML = backupConfig.backups.map(backup => {
+          const date = new Date(backup.timestamp).toLocaleString();
+          const size = (backup.size / 1024).toFixed(2);
+          return `
+            <div class="list-group-item backup-history-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">${date}</h6>
+                  <small class="text-muted">Taille: ${size} KB</small>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Sauvegarde manuelle
+      document.getElementById('backupNowBtn').addEventListener('click', () => {
+        const timestamp = createBackup();
+        showAlert('Sauvegarde créée avec succès !', 'success');
+      });
+
+      // Gestion de la restauration
+      document.getElementById('backupFile').addEventListener('change', function(e) {
+        document.getElementById('restoreBtn').disabled = !this.files.length;
+      });
+
+      document.getElementById('restoreBtn').addEventListener('click', function() {
+        const fileInput = document.getElementById('backupFile');
+        const file = fileInput.files[0];
+        
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const backup = JSON.parse(e.target.result);
+              
+              if (confirm('Êtes-vous sûr de vouloir restaurer cette sauvegarde ? Les données actuelles seront remplacées.')) {
+                // Restaurer les données
+                Object.entries(backup.data).forEach(([key, value]) => {
+                  localStorage.setItem(key, value);
+                });
+
+                showAlert('Restauration effectuée avec succès ! La page va être rechargée...', 'success');
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }
+            } catch (error) {
+              showAlert('Erreur lors de la restauration : fichier invalide', 'danger');
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+
+      // Mise à jour de l'historique des sauvegardes sans déclencher de sauvegarde automatique
+      updateBackupHistory();
+
+      // Charger les paramètres existants
+      const savedSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
+      
+      // Remplir les champs avec les valeurs sauvegardées
+      if (savedSettings) {
+        // Informations entreprise
+        document.getElementById('companyName').value = savedSettings.companyName || '';
+        document.getElementById('slogan').value = savedSettings.slogan || '';
+        document.getElementById('phone').value = savedSettings.phone || '';
+        document.getElementById('email').value = savedSettings.email || '';
+        document.getElementById('website').value = savedSettings.website || '';
+        document.getElementById('address').value = savedSettings.address || '';
+        document.getElementById('city').value = savedSettings.city || '';
+        document.getElementById('postalCode').value = savedSettings.postalCode || '';
+        document.getElementById('country').value = savedSettings.country || 'GA';
+        document.getElementById('description').value = savedSettings.description || '';
+
+        // Compte administrateur
+        document.getElementById('adminFullName').value = savedSettings.adminFullName || '';
+        document.getElementById('adminUsername').value = savedSettings.adminUsername || '';
+        document.getElementById('adminEmail').value = savedSettings.adminEmail || '';
+        document.getElementById('adminPhone').value = savedSettings.adminPhone || '';
+        document.getElementById('adminPassword').value = savedSettings.adminPassword || '';
+        document.getElementById('confirmPassword').value = savedSettings.adminPassword || '';
+      }
+
+      // Gestionnaire d'événement pour le bouton d'enregistrement
+      document.getElementById('saveBtn').addEventListener('click', function() {
+        // Validation des champs requis
+        const requiredFields = [
+          'companyName', 'phone', 'address', 'city',
+          'postalCode', 'country', 'adminFullName', 'adminUsername',
+          'adminPhone', 'adminPassword', 'confirmPassword'
+        ];
+
+        let isValid = true;
+        requiredFields.forEach(fieldId => {
+          const field = document.getElementById(fieldId);
+          if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+          } else {
+            field.classList.remove('is-invalid');
+          }
+        });
+
+        // Validation mot de passe
+        const password = document.getElementById('adminPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+
+        if (password.length < 8) {
+          showAlert('Le mot de passe doit contenir au moins 8 caractères', 'danger');
+          document.getElementById('adminPassword').classList.add('is-invalid');
+          isValid = false;
+        }
+
+        if (password !== confirmPass) {
+          showAlert('Les mots de passe ne correspondent pas', 'danger');
+          document.getElementById('confirmPassword').classList.add('is-invalid');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          showAlert('Veuillez corriger les erreurs dans le formulaire', 'danger');
+          return;
+        }
+
+        // Sauvegarder les paramètres
+        const settings = {
+          // Informations entreprise
+          companyName: document.getElementById('companyName').value.trim(),
+          slogan: document.getElementById('slogan').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          website: document.getElementById('website').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          city: document.getElementById('city').value.trim(),
+          postalCode: document.getElementById('postalCode').value.trim(),
+          country: document.getElementById('country').value,
+          description: document.getElementById('description').value.trim(),
+
+          // Compte administrateur
+          adminFullName: document.getElementById('adminFullName').value.trim(),
+          adminUsername: document.getElementById('adminUsername').value.trim(),
+          username: document.getElementById('adminUsername').value.trim(), // Pour la connexion
+          adminEmail: document.getElementById('adminEmail').value.trim(),
+          adminPhone: document.getElementById('adminPhone').value.trim(),
+          adminPassword: password,
+          password: password // Pour la connexion
+        };
+
+                try {          // Utiliser le gestionnaire de synchronisation          await syncManager.saveChange({            type: 'settings',            id: 'app',            data: settings          });          localStorage.setItem('isConfigured', 'true');          showAlert('Paramètres enregistrés avec succès !', 'success');          // Redirection après 2 secondes          setTimeout(() => {            window.location.href = 'index.html';          }, 2000);
+        } catch (e) {
+          showAlert('Erreur lors de l\'enregistrement des paramètres', 'danger');
+          console.error('Erreur de stockage local:', e);
+        }
+      });
+
+      // Bouton Annuler
+      document.getElementById('cancelBtn').addEventListener('click', function() {
+        if(confirm('Voulez-vous vraiment annuler les modifications ?')) {
+          window.location.href = 'index.html';
+        }
+      });
+
+      // Basculer la visibilité du mot de passe
+      document.querySelectorAll('.password-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+          const input = this.parentElement.querySelector('input');
+          const icon = this.querySelector('i');
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('ph-eye');
+            icon.classList.add('ph-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('ph-eye-slash');
+            icon.classList.add('ph-eye');
+          }
+        });
+      });
+
+      // Fonction pour afficher les alertes
+      function showAlert(message, type) {
+        const alertContainer = document.getElementById('alertContainer');
+        alertContainer.innerHTML = `
+          <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        `;
+      }
+
+      // Déconnexion
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+      });
+
+      document.getElementById('mobileLogoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+      });
+
+      function logout() {
+        if(confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('currentUser');
+          window.location.href = 'auth.html';
+        }
+      }
+
+      // Gestion de la réinitialisation des données
+      document.getElementById('resetDataBtn').addEventListener('click', function() {
+        if(confirm('ATTENTION : Êtes-vous absolument sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.')) {
+          // Double confirmation pour éviter les clics accidentels
+          if(confirm('Dernière confirmation : toutes les données seront effacées. Continuer ?')) {
+            // Effacer toutes les données du localStorage
+            localStorage.clear();
+            
+            showAlert('Toutes les données ont été réinitialisées. Redirection vers la page de connexion...', 'success');
+            
+            // Redirection vers la page de connexion après 2 secondes
+            setTimeout(() => {
+              window.location.href = 'auth.html';
+            }, 2000);
+          }
+        }
+      });
+    });
+  </script>
+  </main>
+
+  <script src="public/js/modules/app.js"></script>
+  <!-- Inclusion des scripts pour l'historique -->
+  <script src="public/js/modules/historique.js"></script>
+  <script src="public/js/modules/parametres.js"></script>
+  <script src="public/js/modules/include-navbar.js"></script>
+    <script src="/js/modules/utils/include-navbar.js" defer></script>
+
+  <script src="/public/js/modules/utils/include-navbar.js" defer></script>
+</body>
+</html>

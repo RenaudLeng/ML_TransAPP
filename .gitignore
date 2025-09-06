@@ -1,0 +1,195 @@
+# ============================================
+# Dépendances et fichiers générés
+# ============================================
+
+# Dépendances
+/node_modules
+/.pnp
+.pnp.js
+
+# Fichiers de verrouillage
+yarn.lock
+package-lock.json
+
+# Fichiers de cache de paquets
+.npm
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp*
+
+# ============================================
+# Environnement et configuration
+# ============================================
+
+# Fichiers d'environnement
+.env
+.env.*
+!.env.example
+
+# Fichiers de configuration local
+.local-*
+
+# ============================================
+# Fichiers de compilation et de build
+# ============================================
+
+# Fichiers de compilation
+/public/dist/
+/build/
+/dist/
+/out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Fichiers TypeScript
+*.tsbuildinfo
+
+# ============================================
+# Tests et couverture de code
+# ============================================
+
+# Couverture de test
+/coverage/
+*.lcov
+.nyc_output/
+
+# ============================================
+# Logs et débogage
+# ============================================
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================
+# Éditeurs et IDEs
+# ============================================
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# IntelliJ/WebStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Autres éditeurs
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*~
+
+# ============================================
+# Système d'exploitation
+# ============================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================
+# Fichiers temporaires
+# ============================================
+
+*.tmp
+*.bak
+*.swp
+*~
+
+# ============================================
+# Dépendances et outils spécifiques
+# ============================================
+
+# Bower
+bower_components/
+
+# JSPM
+jspm_packages/
+
+# Parcel
+.parcel-cache/
+
+# Serverless
+.serverless/
+
+# FuseBox
+.fusebox/
+
+# ============================================
+# Base de données et stockage
+# ============================================
+
+# Fichiers de base de données
+*.sqlite
+*.db
+*.sql
+
+# ============================================
+# Documentation
+# ============================================
+
+docs/_build/
+
+# ============================================
+# Fichiers de projet spécifiques
+# ============================================
+
+# Fichiers de métadonnées
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Fichiers de verrouillage de processus
+.lock-wscript
+
+# Fichiers de débogage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fichiers de couverture de test
+/coverage
+
+# Fichiers de production
+/build
+
+# Fichiers de dépendances
+/node_modules
+
+# Fichiers de cache
+yarn-error.log
+.pnp
+.pnp.js
+
+# Fichiers de configuration local
+.env

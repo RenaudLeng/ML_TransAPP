@@ -1,0 +1,82 @@
+{
+  "name": "ml-transport-app",
+  "version": "1.0.0",
+  "description": "Application de gestion ML Transport",
+  "main": "server.js",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "nodemon start.js",
+    "prod": "NODE_ENV=production node start.js",
+    "db:sync": "node -e \"require('dotenv').config(); require('./src/models').syncModels(true).then(() => process.exit(0)).catch(() => process.exit(1));\"",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:seed": "sequelize-cli db:seed:all",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,jsx,json,md,html,css}\"",
+    "update-paths": "node scripts/update-html-paths.js && node scripts/update-js-paths.js",
+    "test": "NODE_ENV=test jest --config jest.config.json --detectOpenHandles --forceExit",
+    "test:watch": "NODE_ENV=test jest --config jest.config.json --watch",
+    "test:coverage": "NODE_ENV=test jest --config jest.config.json --coverage",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json tests/unit",
+    "test:integration": "NODE_ENV=test jest --config jest.config.json tests/integration"
+  },
+  "keywords": [
+    "transport",
+    "gestion",
+    "ml-transport"
+  ],
+  "author": "ML Transport",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "bootstrap": "^5.3.2",
+    "chart.js": "^4.4.1",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.1.0",
+    "express-sslify": "^1.2.0",
+    "flatpickr": "^4.6.13",
+    "helmet": "^7.2.0",
+    "hpp": "^0.2.3",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongoose": "^8.18.0",
+    "node-localstorage": "^3.0.5",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "phosphor-icons": "^1.4.2",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-promise": "^6.1.1",
+    "jest": "^30.1.3",
+    "jest-mock-express": "^0.1.1",
+    "mongodb-memory-server": "^10.2.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.2.5",
+    "supertest": "^7.1.4"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ],
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cercle de fond -->
+  <circle cx="100" cy="100" r="90" fill="#0d6efd" />
+  
+  <!-- Texte ML -->
+  <text x="100" y="85" font-family="Arial, sans-serif" font-size="60" font-weight="bold" text-anchor="middle" fill="white">ML</text>
+  
+  <!-- Texte Transport -->
+  <text x="100" y="130" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="white">TRANSPORT</text>
+  
+  <!-- Effet de bordure -->
+  <circle cx="100" cy="100" r="95" stroke="#0a58ca" stroke-width="2" />
+</svg>
